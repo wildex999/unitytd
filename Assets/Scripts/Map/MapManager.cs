@@ -17,9 +17,12 @@ public class MapManager : MonoBehaviour {
 
     public List<List<MapTile>> grid = new List<List<MapTile>>();
     public string mapData = null;
+    public static int tileSize = 64; //A tile is 64x64 pixels
 
     private bool moveCamera = false; //Set to true when moving camera(Middle mouse button down)
     private Camera mapCam = null;
+    private MapTile currentTile = null; //Current tile mouse is hovering over
+    private TileHover hoverObj = null;  //GameObject placed over current tile hover
 
     void Start()
     {
@@ -30,6 +33,11 @@ public class MapManager : MonoBehaviour {
         {
             loadMap(mapData);
         }
+
+        //Load TileHover
+        GameObject hoverPrefab = (GameObject)Resources.Load("TileHover");
+        hoverObj = ((GameObject)Instantiate(hoverPrefab)).GetComponent<TileHover>();
+        hoverObj.gameObject.SetActive(false); //Disable it until we hover over a tile
 
         //TestMap
         Debug.Log("Loading test map");
@@ -73,6 +81,38 @@ public class MapManager : MonoBehaviour {
 
         }
         //Camera Movement end
+
+        //Tile hover check
+        Vector3 tilePos = mapCam.ScreenToWorldPoint(Input.mousePosition) - this.transform.position;
+        //1 Unit = 64 pixels, so 1 Unit = 1 tile
+        int tileX = (int)Math.Floor(tilePos.x+0.5f);
+        int tileY = (int)Math.Floor(tilePos.y+0.5f);
+
+        currentTile = getTile(tileX, tileY);
+        if (currentTile != null)
+        {
+            //Place hover object on tile
+            hoverObj.gameObject.SetActive(true);
+            hoverObj.transform.parent = currentTile.transform;
+            hoverObj.transform.localPosition = Vector3.zero;
+        }
+        else
+            hoverObj.gameObject.SetActive(false);
+
+        //TODO: Handle mouse click
+        if(Input.GetMouseButtonDown(0))
+        {
+            if(currentTile == null)
+            {
+                Debug.Log("Left click on null");
+            }
+            else
+            {
+                Debug.Log("Left click on tile: " + currentTile + "(X:" + currentTile.tileX + " Y:"+ currentTile.tileY + ")");
+            }
+        }
+
+
 	}
 
     //Load a map from a string.

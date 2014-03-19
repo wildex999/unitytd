@@ -12,16 +12,13 @@ using System.Collections;
  * Moving MapObjects like mobs are not marked as placed on the tile.
  * */
 
-public class MapTile : MonoBehaviour {
+public class MapTile : MonoBehaviour, IPathNode {
 
-    public static int tileSize = 64; //A tile is 64x64 pixels
     public int tileX, tileY; //The tiles X and Y position on the map. Set by the MapManager when the tile is created
 
     //Allow these default values to be set in the editor for prefabs
-    public bool monsterCanFlyDefault;
-    public int monsterFlyCostDefault;
-    public bool monsterCanWalkDefault;
-    public int monsterWalkCostDefault;
+    public bool canMonsterPassDefault; //Can monster pass on this tile(Fly/Walk)
+    public int monsterPassCostDefault; //Cost of monster walking/Flying over this tile
     public bool canBuildDefault;
 
     private MapManager map;
@@ -67,21 +64,33 @@ public class MapTile : MonoBehaviour {
         obj.setTile(this);
     }
 
-    //Returns whether a monster can fly over this tile
-    public virtual bool canMonsterFly(Monster mob)
+    //Returns whether a monster can walk/fly over this tile
+    public virtual bool canMonsterPass(Monster mob)
     {
-        return monsterCanFlyDefault;
-    }
-
-    //Returns whether a monster can walk over this tile
-    public virtual bool canMonsterWalk(Monster mob)
-    {
-        return monsterCanWalkDefault;
+        return canMonsterPassDefault;
     }
 
     //Returns whether you can build on this tile
     public virtual bool canBuild(Building build)
     {
         return canBuildDefault;
+    }
+
+    //PathFinder
+    int IPathNode.getNodeX()
+    {
+        return tileX;
+    }
+
+    //PathFinder
+    int IPathNode.getNodeY()
+    {
+        return tileY;
+    }
+
+    //PathFinder: get globally Unique ID for this object
+    int IPathNode.getNodeID()
+    {
+        return this.GetInstanceID();
     }
 }
