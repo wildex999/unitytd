@@ -22,7 +22,7 @@ public class MapTile : MonoBehaviour, IPathNode {
     public int monsterPassCostDefault; //Cost of monster walking/Flying over this tile
     public bool canBuildDefault;
 
-    private MapObject mapObj; //The map object placed on this tile(I.e a tower)
+    private ITileObject mapObj; //The map object placed on this tile(I.e a tower)
 
     public void init(MapManager map, int x, int y)
     {
@@ -31,7 +31,7 @@ public class MapTile : MonoBehaviour, IPathNode {
         tileY = y;
     }
 
-    public MapObject getMapObject()
+    public ITileObject getMapObject()
     {
         return mapObj;
     }
@@ -41,8 +41,7 @@ public class MapTile : MonoBehaviour, IPathNode {
         return map;
     }
 
-    //TODO: Make this only accept objects implementing a ITileObject or something like that(I.e getTile and setTile)
-    /*public void setMapObject(MapObject obj)
+    public void setMapObject(ITileObject obj)
     {
         mapObj = obj;
 
@@ -60,10 +59,10 @@ public class MapTile : MonoBehaviour, IPathNode {
         }
 
         //Move the object to the tile
-        obj.transform.parent = this.transform;
-        obj.transform.localPosition = new Vector2(0f, 0f);
+        obj.getGameObject().transform.parent = this.transform;
+        obj.getGameObject().transform.localPosition = new Vector2(0f, 0f);
         obj.setTile(this);
-    }*/
+    }
 
     //Returns whether a monster can walk/fly over this tile
     public virtual bool canMonsterPass(Monster mob)

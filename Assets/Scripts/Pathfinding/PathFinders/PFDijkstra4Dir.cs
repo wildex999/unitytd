@@ -17,6 +17,7 @@ public class PFDijkstra4Dir : PathFinder
     private IPathable pathObj;
     private bool calculated;
     private MapManager map;
+    private uint age; //Used during recalculation
 
     public override bool init(IPathNode target, IPathable pathObj, MapManager map)
     {
@@ -27,6 +28,7 @@ public class PFDijkstra4Dir : PathFinder
         this.target = new PathNodeInfo(target);
         this.pathObj = pathObj;
         this.map = map;
+        age = 1;
         
         return true;
     }
@@ -41,7 +43,7 @@ public class PFDijkstra4Dir : PathFinder
     {
         PathNodeInfo node = null;
         string nodeStr = x + "-" + y;
-        if(!nodes.TryGetValue(nodeStr, out node) && createIfNotFound)
+        if (!nodes.TryGetValue(nodeStr, out node) && createIfNotFound)
         {
             IPathNode pathNode = map.getTile(x, y);
             if (pathNode == null)
@@ -49,7 +51,17 @@ public class PFDijkstra4Dir : PathFinder
             node = new PathNodeInfo(pathNode);
             node.cost = -1;
             node.visited = false;
+            node.age = age;
             nodes[nodeStr] = node;
+        }
+        else if(node != null)
+        {
+            if (node.age != age)
+            {
+                node.cost = -1;
+                node.visited = false;
+                node.age = age;
+            }
         }
         return node;
     }
@@ -57,6 +69,8 @@ public class PFDijkstra4Dir : PathFinder
     //Calculate cost values from all sources to target.
     public override bool calculatePath()
     {
+        age++;
+
         //Prepare
         openList.Add(target, null);
         target.cost = 0; //Target tile always has a cost of 0
@@ -127,7 +141,7 @@ public class PFDijkstra4Dir : PathFinder
         int retCost = Int32.MaxValue;
         foreach(PathNodeInfo currentNode in neighbours)
         {
-            if (currentNode == null)
+            if (currentNode == null || currentNode.cost == -1)
                 continue;
             if(currentNode.cost < retCost)
             {

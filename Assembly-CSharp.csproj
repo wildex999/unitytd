@@ -51,15 +51,22 @@
      <Compile Include="Assets\Scripts\Map\MapTile.cs" />
      <Compile Include="Assets\Scripts\Map\TileHover.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Building.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\ITileObject.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Monster.cs" />
      <Compile Include="Assets\Scripts\MapObjects\MonsterMoveType.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Monsters\Mob1.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\TowerBase.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Towers\TestTower.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\IPathNode.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\IPathable.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathFinder.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathFinders\PFDijkstra4Dir.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathFinders\PathCostCompare.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathNodeInfo.cs" />
+     <Compile Include="Assets\Scripts\TowerList.cs" />
+     <Compile Include="Assets\Scripts\TowerMenu.cs" />
+     <Compile Include="Assets\Scripts\TowerMenuItem.cs" />
+     <Compile Include="Assets\TowerMenuItemEditor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

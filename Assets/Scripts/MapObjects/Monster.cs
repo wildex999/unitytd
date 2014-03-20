@@ -10,6 +10,7 @@ public class Monster : MapObject, IPathable {
     protected MapTile nextNode = null; //Node we are moving towards
 
     protected float speed = 1f;
+    protected int life = 1;
 
     public virtual int getMoveCost(IPathNode from, IPathNode to)
     {
@@ -69,6 +70,7 @@ public class Monster : MapObject, IPathable {
             transform.position = currentNode.transform.position;
             if(nextNode == null) //We have reached the end
                 Destroy(gameObject);
+            Debug.Log("Moving towards: " + nextNode.tileX + " | " + nextNode.tileY);
         }
         else
         {

@@ -13,23 +13,42 @@ using System.Collections.Generic;
  * The MapManager is in effect the game logic manager.
  * */
 
+public enum PlayerState
+{
+    Idle,
+    PlacingTower,
+    InMenu //In menu(Stop taking input/Pause game in singleplayer)
+}
+
 public class MapManager : MonoBehaviour {
 
     public List<List<MapTile>> grid = new List<List<MapTile>>();
     public string mapData = null;
     public static int tileSize = 64; //A tile is 64x64 pixels
 
-    private bool moveCamera = false; //Set to true when moving camera(Middle mouse button down)
     private Camera mapCam = null;
+    private Camera guiCam = null;
+    private TowerMenu towerMenu = null;
+    private GameObject towerMouseSprite = null;
+
+    private bool moveCamera = false; //Set to true when moving camera(Middle mouse button down)
     private MapTile currentTile = null; //Current tile mouse is hovering over
     private TileHover hoverObj = null;  //GameObject placed over current tile hover
+    private TowerBase currentPlaceTower = null; //Tower selected for placing by player
 
     public PathFinder walkingPath;
     public PathFinder flyingPath;
 
+    public PlayerState currentPlayerState;
+
     void Start()
     {
         mapCam = GameObject.Find("MapCam").camera;
+        guiCam = GameObject.Find("GUICam").camera;
+        towerMouseSprite = GameObject.Find("TowerMouseSprite");
+        towerMouseSprite.SetActive(false); //Hide it until we select a tower
+
+        currentPlayerState = PlayerState.Idle;
 
         //If mapData is not null, load it
         if (mapData != null)
@@ -38,9 +57,14 @@ public class MapManager : MonoBehaviour {
         }
 
         //Load TileHover
-        GameObject hoverPrefab = (GameObject)Resources.Load("TileHover");
+        GameObject hoverPrefab = (GameObject)Resources.Load("GUI/TileHover");
         hoverObj = ((GameObject)Instantiate(hoverPrefab)).GetComponent<TileHover>();
         hoverObj.gameObject.SetActive(false); //Disable it until we hover over a tile
+
+        //Get reference to Tower menu
+        towerMenu = GameObject.Find("TowerMenu").GetComponent<TowerMenu>();
+        if (towerMenu == null)
+            Debug.LogError("Error, could not get towerMenu object!");
 
         //TestMap
         Debug.Log("Loading test map");
@@ -73,6 +97,23 @@ public class MapManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        Vector3 worldMousePos = mapCam.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 guiMousePos = guiCam.ScreenToWorldPoint(Input.mousePosition);
+
+        hoverObj.gameObject.SetActive(false);
+
+        if(currentPlayerState == PlayerState.PlacingTower)
+        {
+            //Make Tower selection follow the mouse
+            towerMouseSprite.transform.position = new Vector3(guiMousePos.x, guiMousePos.y, 0);
+        }
+
+        //After this point, if the mouse pointer is over the GUI, nothing more will be executed
+        //So place any non-input stuff above this point!
+        //If the mouse pointer is over the Menu, don't do any input on the map(Avoid clicking stuff behind the GUI)
+        if (towerMenu.mouseHover)
+            return;
+
         //Camera movement
         if (moveCamera == true)
         {
@@ -89,26 +130,28 @@ public class MapManager : MonoBehaviour {
         {
             Screen.lockCursor = false;
             moveCamera = false;
-
         }
-        //Camera Movement end
+        //Camera Zoom
+        float mouseScroll = Input.GetAxis("Mouse ScrollWheel");
+        if(mouseScroll > 0)
+            mapCam.orthographicSize = Mathf.Max(mapCam.orthographicSize - mouseScroll, 3.5f);
+        else if(mouseScroll < 0)
+            mapCam.orthographicSize = Mathf.Min(mapCam.orthographicSize - mouseScroll, 15f);
 
         //Tile hover check
-        Vector3 tilePos = mapCam.ScreenToWorldPoint(Input.mousePosition) - this.transform.position;
+        Vector3 tilePos = worldMousePos - this.transform.position;
         //1 Unit = 64 pixels, so 1 Unit = 1 tile
         int tileX = (int)Math.Floor(tilePos.x+0.5f);
         int tileY = (int)Math.Floor(tilePos.y+0.5f);
 
         currentTile = getTile(tileX, tileY);
-        if (currentTile != null)
+        if (currentTile != null && moveCamera == false)
         {
             //Place hover object on tile
             hoverObj.gameObject.SetActive(true);
             hoverObj.transform.parent = currentTile.transform;
             hoverObj.transform.localPosition = Vector3.zero;
         }
-        else
-            hoverObj.gameObject.SetActive(false);
 
         //TODO: Handle mouse click
         //Left: Place tower if holding
@@ -119,18 +162,41 @@ public class MapManager : MonoBehaviour {
         //Right: If tower is selected, remove selection
         if(Input.GetMouseButtonDown(0))
         {
-            if(currentTile == null)
+            if(currentTile != null)
             {
-                Debug.Log("Left click on null");
+                //Debug.Log("Left click on tile: " + currentTile + "(X:" + currentTile.tileX + " Y:"+ currentTile.tileY + ")");
+                if(currentPlayerState == PlayerState.PlacingTower)
+                {
+                    MapObject newTower = createObject(currentPlaceTower.gameObject);
+                    newTower.transform.position = currentTile.transform.position;
+                    currentTile.canMonsterPassDefault = false;
+                    //Recalculate pathfinding
+                    walkingPath.calculatePath();
+                }
             }
-            else
-            {
-                Debug.Log("Left click on tile: " + currentTile + "(X:" + currentTile.tileX + " Y:"+ currentTile.tileY + ")");
-            }
+        }
+        if(Input.GetMouseButtonDown(1))
+        {
+            if (currentPlayerState == PlayerState.PlacingTower)
+                startPlacingTower(null);
         }
 
 
 	}
+
+    public void startPlacingTower(TowerBase tower)
+    {
+        if(tower == null)
+        {
+            currentPlayerState = PlayerState.Idle;
+            towerMouseSprite.SetActive(false);
+            return;
+        }
+        currentPlayerState = PlayerState.PlacingTower;
+        currentPlaceTower = tower;
+        towerMouseSprite.SetActive(true);
+        towerMouseSprite.GetComponent<SpriteRenderer>().sprite = tower.getPlacementSprite();
+    }
 
     //Load a map from a string.
     public void loadMap(string mapInput)
@@ -216,9 +282,14 @@ public class MapManager : MonoBehaviour {
         GameObject obj = loadGameObject(resource);
         if(obj == null)
             return null;
-        GameObject newObj = (GameObject)Instantiate(obj);
+        return addObject(createObject(obj));
+    }
 
-        return addObject(newObj.GetComponent<MapObject>());
+    //Creates a copy(Instantiates) of the base object
+    public MapObject createObject(GameObject baseObj)
+    {
+        GameObject newObj = (GameObject)Instantiate(baseObj);
+        return newObj.GetComponent<MapObject>();
     }
 
     //Add object to map
@@ -270,9 +341,9 @@ public class MapManager : MonoBehaviour {
                     continue;
 
                 //Destroy map object on tile
-                MapObject obj = tile.getMapObject();
+                ITileObject obj = tile.getMapObject();
                 if (obj != null)
-                    Destroy(obj.gameObject);
+                    Destroy(obj.getGameObject());
 
                 //Destroy tile object
                 Destroy(tile.gameObject);
