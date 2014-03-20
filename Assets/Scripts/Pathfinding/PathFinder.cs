@@ -16,4 +16,6 @@ public abstract class PathFinder
 
     //Get next node from source to target
     public abstract IPathNode getPathNext(IPathNode source);
+
+    public abstract MapManager getMap();
 }

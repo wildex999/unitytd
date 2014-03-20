@@ -15,13 +15,13 @@ using System.Collections;
 public class MapTile : MonoBehaviour, IPathNode {
 
     public int tileX, tileY; //The tiles X and Y position on the map. Set by the MapManager when the tile is created
+    public MapManager map;
 
     //Allow these default values to be set in the editor for prefabs
     public bool canMonsterPassDefault; //Can monster pass on this tile(Fly/Walk)
     public int monsterPassCostDefault; //Cost of monster walking/Flying over this tile
     public bool canBuildDefault;
 
-    private MapManager map;
     private MapObject mapObj; //The map object placed on this tile(I.e a tower)
 
     public void init(MapManager map, int x, int y)
@@ -41,7 +41,8 @@ public class MapTile : MonoBehaviour, IPathNode {
         return map;
     }
 
-    public void setMapObject(MapObject obj)
+    //TODO: Make this only accept objects implementing a ITileObject or something like that(I.e getTile and setTile)
+    /*public void setMapObject(MapObject obj)
     {
         mapObj = obj;
 
@@ -62,7 +63,7 @@ public class MapTile : MonoBehaviour, IPathNode {
         obj.transform.parent = this.transform;
         obj.transform.localPosition = new Vector2(0f, 0f);
         obj.setTile(this);
-    }
+    }*/
 
     //Returns whether a monster can walk/fly over this tile
     public virtual bool canMonsterPass(Monster mob)

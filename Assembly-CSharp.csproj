@@ -53,6 +53,7 @@
      <Compile Include="Assets\Scripts\MapObjects\Building.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Monster.cs" />
      <Compile Include="Assets\Scripts\MapObjects\MonsterMoveType.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Monsters\Mob1.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\IPathNode.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\IPathable.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathFinder.cs" />

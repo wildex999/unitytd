@@ -8,16 +8,11 @@ using System.Collections;
 
 public abstract class MapObject : MonoBehaviour {
     public string displayName; //Name displayed in-game
-    MapTile currentTile; //The current tile the Object is at(Null for moving objects)
+    public MapManager map;
 
-    public virtual void setTile(MapTile tile)
+    public virtual void init(MapManager map)
     {
-        currentTile = tile;
-    }
-
-    public virtual MapTile getTile()
-    {
-        return currentTile;
+        this.map = map;
     }
 
 }

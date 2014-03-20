@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 /*
@@ -30,16 +31,25 @@ public class PFDijkstra4Dir : PathFinder
         return true;
     }
 
+    public override MapManager getMap()
+    {
+        return map;
+    }
+
     //Tries to get the node from the nodes dictionary, or gets it from the map if not available(Creates new PathNodeInfo)
     public PathNodeInfo getNode(int x, int y, bool createIfNotFound = false)
     {
         PathNodeInfo node = null;
-        if(!nodes.TryGetValue(x + "-" + y, out node) && createIfNotFound)
+        string nodeStr = x + "-" + y;
+        if(!nodes.TryGetValue(nodeStr, out node) && createIfNotFound)
         {
             IPathNode pathNode = map.getTile(x, y);
             if (pathNode == null)
                 return null;
             node = new PathNodeInfo(pathNode);
+            node.cost = -1;
+            node.visited = false;
+            nodes[nodeStr] = node;
         }
         return node;
     }
@@ -49,26 +59,11 @@ public class PFDijkstra4Dir : PathFinder
     {
         //Prepare
         openList.Add(target, null);
-        int objMovePoints = pathObj.maxMovePoints();
-
-        //Go through and mark every tile as unvisited(For now just check a square round the obj, optimized would be a circle)
-        objMovePoints++; //Add a border of 1 around
-        for (int y = 0; y < objMovePoints * 2; y++)
-        {
-            for (int x = 0; x < objMovePoints * 2; x++)
-            {
-                //TODO: Check if it already exists in nodes dictionary(Avoids creating a new PathNodeInfo)
-                PathNodeInfo newNodeInfo = getNode((target.node.getNodeX() - objMovePoints) + x, (target.node.getNodeY() - objMovePoints) + y, true);
-                if (newNodeInfo == null)
-                    continue;
-                newNodeInfo.cost = -1;
-                newNodeInfo.visited = false;
-            }
-        }
-        objMovePoints--; //Remove border
-
         target.cost = 0; //Target tile always has a cost of 0
+        target.visited = false;
 
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
 
         //Run algorithm
         //Get first from sorted Open List, put into Closed list
@@ -81,21 +76,21 @@ public class PFDijkstra4Dir : PathFinder
             currentNode = openList.Keys[0]; //We use Keys instead of Values
             openList.Remove(currentNode);
 
-            if (currentNode.cost > objMovePoints)
-                continue;
-
             nodesFound++;
             currentNode.visited = true;
 
             //Neighbours
-            List<PathNodeInfo> neighbours = getNeighbours(currentNode);
+            List<PathNodeInfo> neighbours = getNeighbours(currentNode, true);
 
             foreach (PathNodeInfo tile in neighbours)
             {
                 if (tile == null || tile.visited)
                     continue;
 
-                int newCost = currentNode.cost + pathObj.getMoveCost(currentNode.node, tile.node);
+                int newCost = pathObj.getMoveCost(currentNode.node, tile.node);
+                if (newCost == Int32.MaxValue)
+                    continue;
+                newCost += currentNode.cost;
 
                 if (tile.cost == -1)
                 {
@@ -113,7 +108,9 @@ public class PFDijkstra4Dir : PathFinder
             }
         }
 
-        Debug.Log("Done calculating possible movement: " + (nodesFound));
+        watch.Stop();
+
+        UnityEngine.Debug.Log("Done calculating possible movement: " + (nodesFound) + " and used " + watch.ElapsedMilliseconds + " ms");
         return true;
     }
 
@@ -130,6 +127,8 @@ public class PFDijkstra4Dir : PathFinder
         int retCost = Int32.MaxValue;
         foreach(PathNodeInfo currentNode in neighbours)
         {
+            if (currentNode == null)
+                continue;
             if(currentNode.cost < retCost)
             {
                 retNode = currentNode;
@@ -140,15 +139,15 @@ public class PFDijkstra4Dir : PathFinder
         return retNode.node;
     }
 
-    private List<PathNodeInfo> getNeighbours(PathNodeInfo node)
+    private List<PathNodeInfo> getNeighbours(PathNodeInfo node, bool createIfNotFound = false)
     {
         List<PathNodeInfo> neighbours = new List<PathNodeInfo>(4);
         int tileX = node.node.getNodeX();
         int tileY = node.node.getNodeY();
-        neighbours.Add(getNode(tileX + 1, tileY)); //Right
-        neighbours.Add(getNode(tileX - 1, tileY)); //Left
-        neighbours.Add(getNode(tileX, tileY + 1)); //Up(Positive Y up or down?)
-        neighbours.Add(getNode(tileX, tileY - 1)); //Down(?)
+        neighbours.Add(getNode(tileX + 1, tileY, createIfNotFound)); //Right
+        neighbours.Add(getNode(tileX - 1, tileY, createIfNotFound)); //Left
+        neighbours.Add(getNode(tileX, tileY + 1, createIfNotFound)); //Up(Positive Y up or down?)
+        neighbours.Add(getNode(tileX, tileY - 1, createIfNotFound)); //Down(?)
         //To include diagonals, add them to the neighbours list here
 
         return neighbours;
