@@ -66,6 +66,11 @@ public class PFDijkstra4Dir : PathFinder
         return node;
     }
 
+    public override PathNodeInfo getNodeInfo(IPathNode node)
+    {
+        return getNode(node.getNodeX(), node.getNodeY());
+    }
+
     //Calculate cost values from all sources to target.
     public override bool calculatePath()
     {
@@ -73,6 +78,12 @@ public class PFDijkstra4Dir : PathFinder
 
         //Prepare
         openList.Add(target, null);
+        if(getNode(target.node.getNodeX(), target.node.getNodeY()) == null)
+        {
+            //Make sure the target is in the nodes list
+            nodes.Add(target.node.getNodeX() + "-" + target.node.getNodeY(), target);
+            target.age = age;
+        }
         target.cost = 0; //Target tile always has a cost of 0
         target.visited = false;
 

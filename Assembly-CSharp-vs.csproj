@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\Map\MapManager.cs" />
      <Compile Include="Assets\Scripts\Map\MapObject.cs" />
      <Compile Include="Assets\Scripts\Map\MapTile.cs" />
+     <Compile Include="Assets\Scripts\Map\TestMaps\TestMap1.cs" />
      <Compile Include="Assets\Scripts\Map\TileHover.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Building.cs" />
      <Compile Include="Assets\Scripts\MapObjects\ITileObject.cs" />
@@ -57,12 +58,14 @@
      <Compile Include="Assets\Scripts\MapObjects\Monsters\Mob1.cs" />
      <Compile Include="Assets\Scripts\MapObjects\TowerBase.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Towers\TestTower.cs" />
+     <Compile Include="Assets\Scripts\MapTiles\MapTileSpawn.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\IPathNode.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\IPathable.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathFinder.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathFinders\PFDijkstra4Dir.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathFinders\PathCostCompare.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathNodeInfo.cs" />
+     <Compile Include="Assets\Scripts\Projectiles\Projectile.cs" />
      <Compile Include="Assets\Scripts\TowerList.cs" />
      <Compile Include="Assets\Scripts\TowerMenu.cs" />
      <Compile Include="Assets\Scripts\TowerMenuItem.cs" />

@@ -3,6 +3,34 @@ using UnityEngine;
 public class TestTower : TowerBase
 {
     private static Vector2 size = new Vector2(1,1);
+    private static GameObject bulletBase = Resources.Load<GameObject>("Projectiles/Laser");
+
+    public float firePause; //Timet to wait between fiering
+    private float bulletTimer; 
+
+    public void Start()
+    {
+        setDetectionRange(3.0f);
+        bulletTimer = 0f;
+    }
+
+    public void Update()
+    {
+        //Fire at current target
+        if (currentTarget != null)
+        {
+            bulletTimer -= Time.deltaTime;
+            if (bulletTimer > 0f)
+                return;
+            
+            Projectile bullet = createProjectile(bulletBase);
+            bullet.transform.position = transform.position;
+            bullet.setTarget(currentTarget);
+            bulletTimer += firePause;
+        }
+        else
+            bulletTimer = 0f;
+    }
 
     public override string getName()
     {
@@ -63,5 +91,11 @@ public class TestTower : TowerBase
     public override Sprite getPlacementSprite()
     {
         return GetComponent<SpriteRenderer>().sprite;
+    }
+
+    //Set the towers detection range
+    public void setDetectionRange(float range)
+    {
+        GetComponent<CircleCollider2D>().radius = range;
     }
 }

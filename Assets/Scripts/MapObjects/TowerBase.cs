@@ -4,6 +4,8 @@ using UnityEngine;
 public abstract class TowerBase : Building, ITileObject
 {
     protected MapTile currentTile;
+    protected Monster currentTarget;
+    protected GameObject currentTargetObj; //Store GameObject to avoid GetCompontent calls
 
     public abstract string getName(); //Name of tower, used in tower menu and when showing tower info
     public abstract string getDescription(); //Description, same as name
@@ -39,5 +41,65 @@ public abstract class TowerBase : Building, ITileObject
     public void setTile(MapTile tile)
     {
         currentTile = tile;
+    }
+
+    //Projectile
+    //Create a new(copy) projectile from base
+    public Projectile createProjectile(GameObject baseObj)
+    {
+        //TODO: Object pool
+        if (baseObj == null)
+        {
+            Debug.LogError("Got null baseObj from projectile");
+            return null;
+        }
+
+        GameObject obj = (GameObject)Instantiate(baseObj);
+        if(obj == null)
+        {
+            Debug.LogError("Failed to Instantiate projectile object: " + baseObj);
+            return null;
+        }
+
+        Projectile proj = obj.GetComponent<Projectile>();
+        if(proj == null)
+        {
+            Debug.LogError("Failed to get Projectile script from object: " + obj);
+            return null;
+        }
+
+        return proj;
+    }
+
+
+    //Detection
+
+    //The class inheriting from this class can overide these functions by redefining them
+    void OnTriggerStay2D(Collider2D other)
+    {
+        //TODO: Implement different targeting:
+        //Closest: Check every object in range if closest(DOn't to it every frame, once a seocnd?)
+        //Front: Target object that is closest to the end(I.e at the front), check the cost of the current node they are walking towards.
+        //Weakest
+        //Strongest
+        //Triggers run before update, so it's possible to gather a list of monsters in range, and decide.
+        //For now we just target the first one to enter our range since previous target went out
+        if (currentTarget == null)
+        {
+            currentTarget = other.gameObject.GetComponent<Monster>();
+            //If the other object is not of type Monster, currentTarget will be set to null
+            //TODO: Use layers to reduce tower->tower false positives?
+            if (currentTarget != null)
+                currentTargetObj = other.gameObject;
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject == currentTargetObj)
+        {
+            currentTarget = null;
+            currentTargetObj = null;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class Monster : MapObject, IPathable {
 
@@ -10,7 +11,37 @@ public class Monster : MapObject, IPathable {
     protected MapTile nextNode = null; //Node we are moving towards
 
     protected float speed = 1f;
-    protected int life = 1;
+    protected int health = 1;
+
+    public static LinkedList<Monster> monsters = new LinkedList<Monster>();
+    private LinkedListNode<Monster> listNode;
+
+    public Monster()
+    {
+        //Add to list of active monsters
+        listNode = monsters.AddLast(this);
+    }
+
+    public void OnDisable()
+    {
+        if(listNode != null)
+            monsters.Remove(listNode);
+    }
+
+    //Caled when hit by a projectile
+    public virtual void onHit(Projectile projectile)
+    {
+        health -= projectile.getDamage();
+        if(health <= 0)
+            Destroy(gameObject);
+    }
+
+    //Add a effect on this monster(Slow, Freeze, Rampage etc.)
+    public virtual void addEffect()
+    {
+        //TODO: Implements effects
+        //TODO: Implement imunities
+    }
 
     public virtual int getMoveCost(IPathNode from, IPathNode to)
     {
@@ -30,6 +61,18 @@ public class Monster : MapObject, IPathable {
         currentPath = path;
         currentNode = null;
     }
+
+    public PathFinder getPath()
+    {
+        return currentPath;
+    }
+
+    //Used during placing of towers to ensure no tower blocks the path of a monster
+    public MapTile getNextNode()
+    {
+        return nextNode;
+    }
+
     //A helper function to follow the path towards the goal
     //Takes care of movement and rotation
     public void followPath()
@@ -68,16 +111,18 @@ public class Monster : MapObject, IPathable {
             nextNode = (MapTile)currentPath.getPathNext(currentNode);
             //Set our position to currentNode and don't move this frame. Thus avoiding bypassing the node
             transform.position = currentNode.transform.position;
-            if(nextNode == null) //We have reached the end
+            if(nextNode == currentNode) //We have reached the end
                 Destroy(gameObject);
-            Debug.Log("Moving towards: " + nextNode.tileX + " | " + nextNode.tileY);
+            //Debug.Log("Moving towards: " + nextNode.tileX + " | " + nextNode.tileY);
         }
         else
         {
             //Move towards next node
-            transform.position += (direction.normalized * nextVelocity);
+            Vector3 directionNormalized = direction.normalized;
+            transform.position += (directionNormalized * nextVelocity);
             //Rotate towards nextNode
-            //TODO
+            float angle = Mathf.Atan2(directionNormalized.y, directionNormalized.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle - 90f));
         }
 
     }

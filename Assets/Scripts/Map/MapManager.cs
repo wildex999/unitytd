@@ -68,31 +68,55 @@ public class MapManager : MonoBehaviour {
 
         //TestMap
         Debug.Log("Loading test map");
-        int sizeX = 20;
-        int sizeY = 20;
+
+        List<List<MT>> testMap = TestMap1.testMap;
+        int sizeY = testMap.Count;
+        int sizeX = testMap[0].Count;
         setSize(sizeX, sizeY);
-        for (int y = 0; y < sizeY; y++)
+
+        MapTile goalTile = null;
+
+        for(int y = 0; y < testMap.Count; y++)
         {
-            for (int x = 0; x < sizeX; x++)
+            List<MT> xList = testMap[y];
+            if(xList == null)
+                continue;
+            for (int x = 0; x < xList.Count; x++)
             {
-                addTile(x, y, "MapTiles/MapTileGround");
+                MT tile = xList[x];
+                switch(tile)
+                {
+                    case MT.G:
+                        addTile(x, (testMap.Count-1)-y, "MapTiles/MapTileGround");
+                        break;
+                    case MT.N:
+                        addTile(x, (testMap.Count-1)-y, "MapTiles/MapTileNoBuild");
+                        break;
+                    case MT.W:
+                        addTile(x, (testMap.Count-1)-y, "MapTiles/MapTileWall");
+                        break;
+                    case MT.S:
+                        addTile(x, (testMap.Count-1)-y, "MapTiles/MapTileSpawn");
+                        break;
+                    case MT.C:
+                        goalTile = addTile(x, (testMap.Count - 1) - y, "MapTiles/MapTileCastle");
+                        break;
+                }
             }
         }
 
-        addTile(2, 2, "MapTiles/MapTileWall");
-        addTile(3, 2, "MapTiles/MapTileWall");
-        addTile(4, 2, "MapTiles/MapTileWall");
-        addTile(5, 2, "MapTiles/MapTileWall");
-        addTile(6, 2, "MapTiles/MapTileWall");
-        addTile(7, 2, "MapTiles/MapTileWall");
+        if(goalTile == null)
+            Debug.LogError("No Goal tile found in testmap!");
 
         //Test Mob1
         Monster testMob = (Monster)createObject("Mobs/Mob1");
 
         //Setup pathfinders
         walkingPath = new PFDijkstra4Dir();
-        walkingPath.init(addTile(15, 15, "MapTiles/MapTileWall"), testMob, this);
+        walkingPath.init(goalTile, testMob, this);
         walkingPath.calculatePath();
+
+        Destroy(testMob.gameObject); //Don't spawn it(Will be kept in memory for future reference by PathFinder)
     }
 	
 	// Update is called once per frame
@@ -165,13 +189,43 @@ public class MapManager : MonoBehaviour {
             if(currentTile != null)
             {
                 //Debug.Log("Left click on tile: " + currentTile + "(X:" + currentTile.tileX + " Y:"+ currentTile.tileY + ")");
-                if(currentPlayerState == PlayerState.PlacingTower)
+                if(currentPlayerState == PlayerState.PlacingTower && currentTile.canBuild(currentPlaceTower) || currentTile.getMapObject() != null)
                 {
                     MapObject newTower = createObject(currentPlaceTower.gameObject);
-                    newTower.transform.position = currentTile.transform.position;
+                    currentTile.setMapObject((TowerBase)newTower);
                     currentTile.canMonsterPassDefault = false;
-                    //Recalculate pathfinding
+
+                    //Recalculate all paths
                     walkingPath.calculatePath();
+
+                    //See if any mobs now have no path to the end, if so destroy the placed tower(Or deny it in some way)
+                    //TODO: Check if path from spawner is clear
+                    bool killTower = false;
+                    foreach(Monster monster in Monster.monsters)
+                    {
+                        PathFinder path = monster.getPath();
+                        MapTile nextTile = monster.getNextNode();
+                        if (path == null || nextTile == null)
+                            continue;
+                        PathNodeInfo nextNode = path.getNodeInfo(nextTile);
+                        if (nextNode == null)
+                            continue;
+                        if (nextNode.cost == -1)
+                        {
+                            killTower = true;
+                            break;
+                        }
+                    }
+
+                    if(killTower)
+                    {
+                        Destroy(currentTile.getMapObject().getGameObject());
+                        currentTile.setMapObject(null);
+                        currentTile.canMonsterPassDefault = true;
+
+                        //Recalculate all paths
+                        walkingPath.calculatePath();
+                    }
                 }
             }
         }
@@ -256,8 +310,13 @@ public class MapManager : MonoBehaviour {
             Debug.Log("Casting to MapTile failed for " + resource + "(" + e + ")");
             return null;
         }
-
-        return setTile(x, y, tile);
+        MapTile ret = setTile(x, y, tile);
+        if(ret == null)
+        {
+            Debug.LogError("Failed to set tile at " + x + " | " + y);
+            Destroy(tile.gameObject);
+        }
+        return ret;
     }
 
     //Set the tile at the x-y position on the grid
@@ -286,7 +345,7 @@ public class MapManager : MonoBehaviour {
     }
 
     //Creates a copy(Instantiates) of the base object
-    public MapObject createObject(GameObject baseObj)
+    public static MapObject createObject(GameObject baseObj)
     {
         GameObject newObj = (GameObject)Instantiate(baseObj);
         return newObj.GetComponent<MapObject>();
