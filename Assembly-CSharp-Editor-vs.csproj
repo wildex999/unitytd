@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_STANDALONE_WIN;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_WEBPLAYER;WEBPLUG;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -47,6 +47,31 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Editor\TowerMenuItemEditor.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_AutoRun.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_DatePicker.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_DeleteAssetBundleMenu.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_EventPicker.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_ExampleTutorial.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_HeatMapInspector.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_HeatMapRendererInspector.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_HeatmapColorPresetPicker.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_HeatmapCombineTypePicker.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_Inspector.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_Menu.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_SetupWizard.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_Status.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_SystemTrackerInspector.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_TrackerInspector.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_UpdateWindow.cs" />
+     <Compile Include="Assets\GameAnalytics\Editor\GA_WebInterface.cs" />
+     <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapSolidOverlay.shader" />
+     <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapTransparentOverlay.shader" />
+     <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapSolid.shader" />
+     <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapTransparent.shader" />
+     <None Include="Assets\GameAnalytics\Plugins\WebPlayer\Readme_WebPlayer.txt" />
+     <None Include="Assets\GameAnalytics\Plugins\iOS\iOS_Readme.txt" />
+     <None Include="Assets\GameAnalytics\Plugins\WebPlayer\crossdomain.xml" />
+     <None Include="Assets\GameAnalytics\Plugins\Android\Android_Readme.txt" />
  <Reference Include="UnityEditor.Graphs">
  <HintPath>N:\Development\Unity\Editor\Data\Managed\UnityEditor.Graphs.dll</HintPath>
  </Reference>

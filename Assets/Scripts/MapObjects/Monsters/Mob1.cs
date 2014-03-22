@@ -6,8 +6,6 @@ public class Mob1 : Monster {
 	// Use this for initialization
 	void Start () {
         setPath(map.walkingPath);
-        speed = 1f;
-        health = 100;
 	}
 	
 	// Update is called once per frame

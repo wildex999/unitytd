@@ -10,8 +10,8 @@ public class Monster : MapObject, IPathable {
     protected MapTile currentNode = null; //Node we were on previously
     protected MapTile nextNode = null; //Node we are moving towards
 
-    protected float speed = 1f;
-    protected int health = 1;
+    public float speed = 1f;
+    public int health = 1;
 
     public static LinkedList<Monster> monsters = new LinkedList<Monster>();
     private LinkedListNode<Monster> listNode;
@@ -32,8 +32,11 @@ public class Monster : MapObject, IPathable {
     public virtual void onHit(Projectile projectile)
     {
         health -= projectile.getDamage();
-        if(health <= 0)
+        if (health <= 0)
+        {
+            GA.API.Design.NewEvent("ALPHA1:GAME:MonsterKilled", transform.position);
             Destroy(gameObject);
+        }
     }
 
     //Add a effect on this monster(Slow, Freeze, Rampage etc.)
@@ -79,7 +82,7 @@ public class Monster : MapObject, IPathable {
     {
         if (currentPath == null)
         {
-            Debug.Log("No path!");
+            Debug.LogError("No path!");
             return;
         }
         if(currentNode == null)
@@ -88,14 +91,14 @@ public class Monster : MapObject, IPathable {
             currentNode = map.getTileWorld(transform.position.x, transform.position.y);
             if(currentNode == null)
             {
-                Debug.Log("No node available for position: " + transform.position.x + " | " + transform.position.y);
+                Debug.LogError("No node available for position: " + transform.position.x + " | " + transform.position.y);
                 return;
             }
             nextNode = (MapTile)currentPath.getPathNext(currentNode);
 
             if(nextNode == null)
             {
-                Debug.Log("Got null nextNode!");
+                Debug.LogError("Got null nextNode!");
                 return;
             }
         }
@@ -111,8 +114,11 @@ public class Monster : MapObject, IPathable {
             nextNode = (MapTile)currentPath.getPathNext(currentNode);
             //Set our position to currentNode and don't move this frame. Thus avoiding bypassing the node
             transform.position = currentNode.transform.position;
-            if(nextNode == currentNode) //We have reached the end
+            if (nextNode == currentNode) //We have reached the end
+            {
+                GA.API.Design.NewEvent("ALPHA1:GAME:MonsterReachedCastle");
                 Destroy(gameObject);
+            }
             //Debug.Log("Moving towards: " + nextNode.tileX + " | " + nextNode.tileY);
         }
         else

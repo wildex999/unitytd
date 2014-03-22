@@ -2,7 +2,7 @@
 using UnityEngine;
 public class TestTower : TowerBase
 {
-    private static Vector2 size = new Vector2(1,1);
+    private static int size = 2; //2x2
     private static GameObject bulletBase = Resources.Load<GameObject>("Projectiles/Laser");
 
     public float firePause; //Timet to wait between fiering
@@ -10,8 +10,9 @@ public class TestTower : TowerBase
 
     public void Start()
     {
-        setDetectionRange(3.0f);
+        setDetectionRange(1.5f);
         bulletTimer = 0f;
+        GA.API.Design.NewEvent("ALPHA1:GAME:BuiltTower", transform.position);
     }
 
     public void Update()
@@ -47,7 +48,7 @@ public class TestTower : TowerBase
         return 10;
     }
 
-    public override UnityEngine.Vector2 getSize()
+    public override int getSize()
     {
         return size;
     }

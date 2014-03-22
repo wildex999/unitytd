@@ -134,6 +134,7 @@ public class PFDijkstra4Dir : PathFinder
         }
 
         watch.Stop();
+        GA.API.Design.NewEvent("ALPHA1:PERF:PathFindTime", watch.ElapsedMilliseconds);
 
         UnityEngine.Debug.Log("Done calculating possible movement: " + (nodesFound) + " and used " + watch.ElapsedMilliseconds + " ms");
         return true;
@@ -143,7 +144,10 @@ public class PFDijkstra4Dir : PathFinder
     {
         PathNodeInfo node = getNode(source.getNodeX(), source.getNodeY());
         if (node == null || node.cost == -1)
+        {
+            UnityEngine.Debug.Log("Next node null or cost -1: " + node);
             return null;
+        }
         if (node.cost == 0)
             return source; //At target
         //Return the neightbour node with least cost

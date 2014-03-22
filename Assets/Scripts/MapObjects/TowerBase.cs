@@ -3,7 +3,7 @@
 using UnityEngine;
 public abstract class TowerBase : Building, ITileObject
 {
-    protected MapTile currentTile;
+    protected TileGroup tileGroup;
     protected Monster currentTarget;
     protected GameObject currentTargetObj; //Store GameObject to avoid GetCompontent calls
 
@@ -14,7 +14,7 @@ public abstract class TowerBase : Building, ITileObject
     public abstract Sprite getMenuSprite(); //Sprite to show while in the menu
     public abstract Sprite getPlacementSprite(); //Sprite to show while placing tower
 
-    public abstract Vector2 getSize(); //The size of the tower in number of tiles(X and Y)
+    public abstract int getSize(); //The size of the tower in number of tiles
 
     public abstract void showRange(bool show); //Render the range indicator for the tower
 
@@ -27,20 +27,27 @@ public abstract class TowerBase : Building, ITileObject
 
     //TODO: Upgrade options 
 
+    public TowerBase()
+    {
+        tileGroup = new TileGroup(this);
+    }
+
+    public virtual bool canMonsterPass(Monster mob)
+    {
+        if (mob.getMoveType() == MonsterMoveType.Walking)
+            return false;
+        return true;
+    }
+
     //Tile
     public GameObject getGameObject()
     {
         return gameObject;
     }
 
-    public MapTile getTile()
+    public TileGroup getTileGroup()
     {
-        return currentTile;
-    }
-
-    public void setTile(MapTile tile)
-    {
-        currentTile = tile;
+        return tileGroup;
     }
 
     //Projectile

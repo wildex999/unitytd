@@ -41,33 +41,18 @@ public class MapTile : MonoBehaviour, IPathNode {
         return map;
     }
 
-    public void setMapObject(ITileObject obj)
+    public virtual void setMapObject(ITileObject obj)
     {
         mapObj = obj;
-
-        if (obj == null)
-            return;
-
-        //Remove from previous tile
-        MapTile prevTile = obj.getTile();
-        if (prevTile != null)
-        {
-            if (prevTile == this)
-                return;
-            if (prevTile.getMapObject() == obj)
-                prevTile.setMapObject(null);
-        }
-
-        //Move the object to the tile
-        obj.getGameObject().transform.parent = this.transform;
-        obj.getGameObject().transform.localPosition = new Vector2(0f, 0f);
-        obj.setTile(this);
     }
 
     //Returns whether a monster can walk/fly over this tile
     public virtual bool canMonsterPass(Monster mob)
     {
-        return canMonsterPassDefault;
+        if (mapObj == null)
+            return canMonsterPassDefault;
+        else
+            return mapObj.canMonsterPass(mob);
     }
 
     //Returns whether you can build on this tile
