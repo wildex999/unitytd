@@ -31,10 +31,14 @@ public class MapManager : MonoBehaviour {
     private TowerMenu towerMenu = null;
     private GameObject towerMouseSprite = null;
 
+    private MapTile goalTile = null;
+    private MapTile spawnTile = null;
+
     private bool moveCamera = false; //Set to true when moving camera(Middle mouse button down)
     private MapTile currentTile = null; //Current tile mouse is hovering over
     private TileHover hoverObj = null;  //GameObject placed over current tile hover
     private TowerBase currentPlaceTower = null; //Tower selected for placing by player
+    private ResourceCache<GameObject> prefabCache = new ResourceCache<GameObject>();
 
     public PathFinder walkingPath = new PFDijkstra4Dir();
     public PathFinder flyingPath = new PFDijkstra4Dir();
@@ -74,7 +78,7 @@ public class MapManager : MonoBehaviour {
         int sizeX = testMap[0].Count;
         setSize(sizeX, sizeY);
 
-        MapTile goalTile = null;
+        goalTile = null;
 
         for(int y = 0; y < testMap.Count; y++)
         {
@@ -96,7 +100,7 @@ public class MapManager : MonoBehaviour {
                         addTile(x, (testMap.Count-1)-y, "MapTiles/MapTileWall");
                         break;
                     case MT.S:
-                        addTile(x, (testMap.Count-1)-y, "MapTiles/MapTileSpawn");
+                        spawnTile = addTile(x, (testMap.Count-1)-y, "MapTiles/MapTileSpawn");
                         break;
                     case MT.C:
                         goalTile = addTile(x, (testMap.Count - 1) - y, "MapTiles/MapTileCastle");
@@ -245,7 +249,6 @@ public class MapManager : MonoBehaviour {
                         flyingPath.calculatePath();
 
                         //See if any mobs now have no path to the end, if so destroy the placed tower(Or deny it in some way)
-                        //TODO: Check if path from spawner(s) is clear
                         bool killTower = false;
                         foreach (Monster monster in Monster.monsters)
                         {
@@ -262,6 +265,13 @@ public class MapManager : MonoBehaviour {
                                 break;
                             }
                         }
+
+                        //TODO: Check multiple spawns for multiple paths
+                        //checkAllSpawn()
+                        if (walkingPath.getNodeInfo(spawnTile).cost == -1)
+                            killTower = true;
+                        if (flyingPath.getNodeInfo(spawnTile).cost == -1)
+                            killTower = true;
 
                         if (killTower)
                         {
@@ -331,8 +341,12 @@ public class MapManager : MonoBehaviour {
     //Load GameObject from string
     public GameObject loadGameObject(string resource)
     {
-        //TODO Reosurces.Load is slow, so cache the returned object and reuse for later
-        GameObject obj = (GameObject)Resources.Load(resource);
+        GameObject obj = prefabCache.getResource(resource);
+        if (obj == null)
+        {
+            obj = (GameObject)Resources.Load(resource);
+            prefabCache.setResource(resource, obj);
+        }
         return obj;
     }
 

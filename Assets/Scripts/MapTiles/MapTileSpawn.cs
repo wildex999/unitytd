@@ -9,12 +9,18 @@ public class MapTileSpawn : MapTile {
 
     private float lastUnitTime;
     private float lastFlyerTime;
-    private GameObject Mob1 = Resources.Load<GameObject>("Mobs/Mob1");
-    private GameObject Mob2 = Resources.Load<GameObject>("Mobs/Mob2_Flying");
+    private GameObject Mob1 = null;
+    private GameObject Mob2 = null;
 
 
     void Start()
     {
+        if(Mob1 == null)
+        {
+            Mob1 = Resources.Load<GameObject>("Mobs/Mob1");
+            Mob2 = Resources.Load<GameObject>("Mobs/Mob2_Flying");
+        }
+
         //Start timer for waves
         //TODO
     }

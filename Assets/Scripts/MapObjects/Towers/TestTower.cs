@@ -3,13 +3,16 @@ using UnityEngine;
 public class TestTower : TowerBase
 {
     private static int size = 2; //2x2
-    private static GameObject bulletBase = Resources.Load<GameObject>("Projectiles/Laser");
+    private static GameObject bulletBase = null;
 
     public float firePause; //Timet to wait between fiering
     private float bulletTimer; 
 
     public void Start()
     {
+        if(bulletBase == null)
+            bulletBase = Resources.Load<GameObject>("Projectiles/Laser");
+
         setDetectionRange(1.5f);
         bulletTimer = 0f;
         GA.API.Design.NewEvent("ALPHA1:GAME:BuiltTower", transform.position);

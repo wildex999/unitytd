@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_WEBPLAYER;WEBPLUG;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_WEBPLAYER;WEBPLUG;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -46,6 +46,15 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\GUI\Script\GUIButton.cs" />
+     <Compile Include="Assets\GUI\Script\GUIHandler.cs" />
+     <Compile Include="Assets\GUI\Script\GUIPanel.cs" />
+     <Compile Include="Assets\GUI\Script\GUIScrollBar.cs" />
+     <Compile Include="Assets\GUI\Script\GUIScrollManager.cs" />
+     <Compile Include="Assets\GUI\Script\GUITextInput.cs" />
+     <Compile Include="Assets\GUI\Script\GUIToggle.cs" />
+     <Compile Include="Assets\GUI\Script\GUIWidget.cs" />
+     <Compile Include="Assets\GUI\Script\Interfaces\IClickHandler.cs" />
      <Compile Include="Assets\GameAnalytics\Plugins\Components\GA_Tracker.cs" />
      <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\ComboBox.cs" />
      <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleBall.cs" />
@@ -93,12 +102,15 @@
      <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendDesignEvent.cs" />
      <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendQualityEvent.cs" />
      <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendUserEvent.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonPlayTestMap.cs" />
+     <Compile Include="Assets\Scripts\GUI\MapEditor\ToggleShowTiles.cs" />
      <Compile Include="Assets\Scripts\Map\MapManager.cs" />
      <Compile Include="Assets\Scripts\Map\MapObject.cs" />
      <Compile Include="Assets\Scripts\Map\MapTile.cs" />
      <Compile Include="Assets\Scripts\Map\TestMaps\TestMap1.cs" />
      <Compile Include="Assets\Scripts\Map\TileGroup.cs" />
      <Compile Include="Assets\Scripts\Map\TileHover.cs" />
+     <Compile Include="Assets\Scripts\MapEditor\EditorMap.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Building.cs" />
      <Compile Include="Assets\Scripts\MapObjects\ITileObject.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Monster.cs" />
@@ -120,12 +132,16 @@
      <Compile Include="Assets\Scripts\TowerList.cs" />
      <Compile Include="Assets\Scripts\TowerMenu.cs" />
      <Compile Include="Assets\Scripts\TowerMenuItem.cs" />
+     <Compile Include="Assets\Scripts\utils\ResourceCache.cs" />
+     <Compile Include="Assets\Scripts\utils\SortedListOrderCompare.cs" />
      <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapSolidOverlay.shader" />
      <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapTransparentOverlay.shader" />
      <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapSolid.shader" />
      <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapTransparent.shader" />
      <None Include="Assets\GameAnalytics\Plugins\WebPlayer\Readme_WebPlayer.txt" />
+     <None Include="Assets\GUI\Shaders\ClipSprite.shader" />
      <None Include="Assets\GameAnalytics\Plugins\iOS\iOS_Readme.txt" />
+     <None Include="Assets\GUI\Shaders\TextShader.shader" />
      <None Include="Assets\GameAnalytics\Plugins\WebPlayer\crossdomain.xml" />
      <None Include="Assets\GameAnalytics\Plugins\Android\Android_Readme.txt" />
   </ItemGroup>
