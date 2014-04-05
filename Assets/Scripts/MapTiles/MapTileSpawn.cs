@@ -27,6 +27,9 @@ public class MapTileSpawn : MapTile {
 
     void Update()
     {
+        if (!MapManager.gameRunning)
+            return;
+
         lastUnitTime -= Time.deltaTime;
         if (lastUnitTime <= 0f)
         {

@@ -6,6 +6,6 @@ R:\Development\Unity_TD\Temp\bin\Debug\Mono.Cecil.dll
 R:\Development\Unity_TD\Temp\bin\Debug\nunit.framework.dll
 R:\Development\Unity_TD\Temp\bin\Debug\Unity.DataContract.dll
 R:\Development\Unity_TD\Temp\bin\Debug\ICSharpCode.NRefactory.dll
-R:\Development\Unity_TD\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
 R:\Development\Unity_TD\obj\Debug\Assembly-CSharp.dll
 R:\Development\Unity_TD\obj\Debug\Assembly-CSharp.pdb
+R:\Development\Unity_TD\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache

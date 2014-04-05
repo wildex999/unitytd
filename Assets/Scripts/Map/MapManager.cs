@@ -20,11 +20,10 @@ public enum PlayerState
     InMenu //In menu(Stop taking input/Pause game in singleplayer)
 }
 
-public class MapManager : MonoBehaviour {
+public class MapManager : MapBase {
 
     public List<List<MapTile>> grid = new List<List<MapTile>>();
-    public string mapData = null;
-    public static int tileSize = 64; //A tile is 64x64 pixels
+    public static bool gameRunning = false; //Used for pausing or when in map editor
 
     private Camera mapCam = null;
     private Camera guiCam = null;
@@ -38,7 +37,6 @@ public class MapManager : MonoBehaviour {
     private MapTile currentTile = null; //Current tile mouse is hovering over
     private TileHover hoverObj = null;  //GameObject placed over current tile hover
     private TowerBase currentPlaceTower = null; //Tower selected for placing by player
-    private ResourceCache<GameObject> prefabCache = new ResourceCache<GameObject>();
 
     public PathFinder walkingPath = new PFDijkstra4Dir();
     public PathFinder flyingPath = new PFDijkstra4Dir();
@@ -125,6 +123,8 @@ public class MapManager : MonoBehaviour {
 
         Destroy(testMob.gameObject); //Don't spawn it(Will be kept in memory for future reference by PathFinder)
         Destroy(testMobFlying.gameObject);
+
+        gameRunning = true;
     }
 	
 	// Update is called once per frame
@@ -313,79 +313,22 @@ public class MapManager : MonoBehaviour {
         towerMouseSprite.transform.localScale = tower.transform.localScale;
     }
 
-    //Load a map from a string.
-    public void loadMap(string mapInput)
+    //Add object to map
+    public override MapObject addObject(MapObject obj)
     {
-        mapData = mapInput;
-
-        //Parse and create tiles
-        //TODO
-        //sizex;sizey;ObjName,arg1,arg2...;Objname2;objName3;...
-    }
-
-    //Set the map size.
-    //Note: Clears anything existing
-    public void setSize(int width, int height)
-    {
-        clearMap();
-
-        for (int y = 0; y < height; y++)
-        {
-            List<MapTile> xList = new List<MapTile>();
-            grid.Add(xList);
-            for (int x = 0; x < width; x++)
-                xList.Add(null);
-        }
-    }
-
-    //Load GameObject from string
-    public GameObject loadGameObject(string resource)
-    {
-        GameObject obj = prefabCache.getResource(resource);
-        if (obj == null)
-        {
-            obj = (GameObject)Resources.Load(resource);
-            prefabCache.setResource(resource, obj);
-        }
+        obj.transform.parent = this.transform;
+        obj.transform.localPosition = Vector3.zero;
+        obj.init(this);
         return obj;
     }
 
-    //Create a new GameObject and add it as a tile
-    public MapTile addTile(int x, int y, string resource)
+    public override void removeObject(MapObject obj)
     {
-        MapTile tile;
-        try
-        {
-            GameObject obj = loadGameObject(resource);
-            if (obj == null)
-                return null;
-            GameObject newObj = (GameObject)Instantiate(obj);
-            newObj.transform.parent = this.transform;
-            newObj.transform.localPosition = new Vector2(x, y);
-
-            tile = newObj.GetComponent<MapTile>();
-            if (tile == null)
-            {
-                Destroy(newObj.gameObject); //Don't need it if this failed
-                return null;
-            }
-        }
-        catch (InvalidCastException e)
-        {
-            Debug.Log("Casting to MapTile failed for " + resource + "(" + e + ")");
-            return null;
-        }
-        MapTile ret = setTile(x, y, tile);
-        if(ret == null)
-        {
-            Debug.LogError("Failed to set tile at " + x + " | " + y);
-            Destroy(tile.gameObject);
-        }
-        return ret;
+        obj.transform.parent = null;
+        obj.map = null;
     }
 
-    //Set the tile at the x-y position on the grid
-    public MapTile setTile(int x, int y, MapTile tile)
+    public override MapTile setTile(int x, int y, MapTile tile)
     {
         if (y >= grid.Count || y < 0 || x >= grid[y].Count || x < 0)
             return null;
@@ -400,45 +343,7 @@ public class MapManager : MonoBehaviour {
         return tile;
     }
 
-    //Set a object to a group of tiles, size is the number of tiles(I.e, a size of 2, will place the object at a 2x2 group of tiles, with the top left one being the start tile)
-    //This is for objects covering multiple tiles(I.e towers)
-    public void setTilesObject(MapTile start, int size, ITileObject tileObj)
-    {
-
-    }
-
-    //Create a new instance of objecty given by resource string and add it to the map
-    public MapObject createObject(string resource)
-    {
-        GameObject obj = loadGameObject(resource);
-        if(obj == null)
-            return null;
-        return addObject(createObject(obj));
-    }
-
-    //Creates a copy(Instantiates) of the base object
-    public static MapObject createObject(GameObject baseObj)
-    {
-        GameObject newObj = (GameObject)Instantiate(baseObj);
-        return newObj.GetComponent<MapObject>();
-    }
-
-    //Add object to map
-    public MapObject addObject(MapObject obj)
-    {
-        obj.transform.parent = this.transform;
-        obj.transform.localPosition = Vector3.zero;
-        obj.init(this);
-        return obj;
-    }
-
-    public void removeObject(MapObject obj)
-    {
-        obj.transform.parent = null;
-        obj.map = null;
-    }
-
-    public MapTile getTile(int x, int y)
+    public override MapTile getTile(int x, int y)
     {
         if (y >= grid.Count || y < 0)
             return null;
@@ -448,18 +353,21 @@ public class MapManager : MonoBehaviour {
         return grid[y][x];
     }
 
-    //Get the tile at the given world position
-    public MapTile getTileWorld(float x, float y)
+    public override void setSize(int width, int height)
     {
-        Vector3 tilePos = new Vector3(x, y, 0) - transform.position;
-        int tileX = (int)Math.Floor(tilePos.x + 0.5f);
-        int tileY = (int)Math.Floor(tilePos.y + 0.5f);
+        clearMap();
 
-        return getTile(tileX, tileY);
+        for (int y = 0; y < height; y++)
+        {
+            List<MapTile> xList = new List<MapTile>();
+            grid.Add(xList);
+            for (int x = 0; x < width; x++)
+                xList.Add(null);
+        }
     }
 
     //Clear every MapTile and MapObject(Delete them)
-    void clearMap()
+    public override void clearMap()
     {
         int height = grid.Count;
         for (int y = 0; y < height; y++)

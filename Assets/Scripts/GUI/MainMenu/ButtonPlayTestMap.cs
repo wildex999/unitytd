@@ -3,9 +3,8 @@ using System.Collections;
 
 public class ButtonPlayTestMap : MonoBehaviour {
 
-    void OnMouseDown()
+    void OnClick()
     {
-        Debug.Log("CLICKED");
         Application.LoadLevel(1);
     }
 }
