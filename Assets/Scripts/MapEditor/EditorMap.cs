@@ -42,6 +42,7 @@ public class EditorMap : MapBase {
 	// Use this for initialization
 	void Start () {
         placeHover.SetActive(false);
+        GA.API.Design.NewEvent("ALPHA2:GAME:StartMapEditor");
 	}
 	
 	// Update is called once per frame

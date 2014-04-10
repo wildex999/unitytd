@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_WEBPLAYER;WEBPLUG;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_STANDALONE_WIN;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -212,10 +212,14 @@
      <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
      <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonMapEditor.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonMultiplayer.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonOnline.cs" />
      <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonPlayTestMap.cs" />
      <Compile Include="Assets\Scripts\GUI\MapEditor\GraphicItem.cs" />
      <Compile Include="Assets\Scripts\GUI\MapEditor\TileItem.cs" />
      <Compile Include="Assets\Scripts\GUI\MapEditor\ToggleWindow.cs" />
+     <Compile Include="Assets\Scripts\GUI\Network\MainServerStatusLabel.cs" />
+     <Compile Include="Assets\Scripts\GUI\TowerItem.cs" />
      <Compile Include="Assets\Scripts\Map\MapBase.cs" />
      <Compile Include="Assets\Scripts\Map\MapManager.cs" />
      <Compile Include="Assets\Scripts\Map\MapObject.cs" />
@@ -235,6 +239,13 @@
      <Compile Include="Assets\Scripts\MapObjects\Towers\TowerAirWall.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Towers\TowerSell.cs" />
      <Compile Include="Assets\Scripts\MapTiles\MapTileSpawn.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\Message.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageLogin.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageLoginReply.cs" />
+     <Compile Include="Assets\Scripts\Network\NetManager.cs" />
+     <Compile Include="Assets\Scripts\Network\NetworkGame.cs" />
+     <Compile Include="Assets\Scripts\Network\TestClient.cs" />
+     <Compile Include="Assets\Scripts\Network\TestServer.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\IPathNode.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\IPathable.cs" />
      <Compile Include="Assets\Scripts\Pathfinding\PathFinder.cs" />
@@ -243,8 +254,9 @@
      <Compile Include="Assets\Scripts\Pathfinding\PathNodeInfo.cs" />
      <Compile Include="Assets\Scripts\Projectiles\Projectile.cs" />
      <Compile Include="Assets\Scripts\TowerList.cs" />
-     <Compile Include="Assets\Scripts\TowerMenu.cs" />
      <Compile Include="Assets\Scripts\TowerMenuItem.cs" />
+     <Compile Include="Assets\Scripts\utils\ConcurrentQueue.cs" />
+     <Compile Include="Assets\Scripts\utils\DataStream.cs" />
      <Compile Include="Assets\Scripts\utils\ResourceCache.cs" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth Cutout.shader" />
      <None Include="Assets\NGUI\Examples\Models\Orc\Orc Skin.shader" />

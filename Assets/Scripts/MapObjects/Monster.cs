@@ -10,6 +10,10 @@ public class Monster : MapObject, IPathable {
     protected MapTile currentNode = null; //Node we were on previously
     protected MapTile nextNode = null; //Node we are moving towards
 
+    //Fixed simulation(Deterministic)
+    protected Transform fixedTransform; //The transform used by the fixed timestep simulation
+
+    //public uint speed = 10; //10 of 200(200 = 20 tiles a second)(Sim fps = 20)
     public float speed = 1f;
     public int health = 1;
 
@@ -76,35 +80,41 @@ public class Monster : MapObject, IPathable {
         return nextNode;
     }
 
-    //A helper function to follow the path towards the goal
-    //Takes care of movement and rotation
-    public void followPath()
+    //Get next node if not set, and put it at currentPath
+    public void getNode()
     {
         if (currentPath == null)
         {
             Debug.LogError("No path!");
             return;
         }
-        if(currentNode == null)
+        if (currentNode == null)
         {
             //Get node for current position and get next node
             currentNode = map.getTileWorld(transform.position.x, transform.position.y);
-            if(currentNode == null)
+            if (currentNode == null)
             {
                 Debug.LogError("No node available for position: " + transform.position.x + " | " + transform.position.y);
                 return;
             }
             nextNode = (MapTile)currentPath.getPathNext(currentNode);
 
-            if(nextNode == null)
+            if (nextNode == null)
             {
                 Debug.LogError("Got null nextNode!");
                 return;
             }
         }
+    }
+
+    //A helper function to follow the path towards the goal
+    //Takes care of movement and rotation
+    public void followPath()
+    {
+        getNode();
 
         //How much will we move this step
-        float nextVelocity = Time.deltaTime * speed;
+        float nextVelocity = Time.deltaTime * (speed);
 
         //Check how close we are to nextNode and see if we are to move on to the next node
         Vector3 direction = nextNode.transform.position - transform.position;

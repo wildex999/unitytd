@@ -22,19 +22,19 @@ public class TowerMenuItem : MonoBehaviour {
         if(Input.GetMouseButtonDown(0))
         {
             //Set as selected tower
-            TowerMenu.instance.map.startPlacingTower(tower);
+            //TowerMenu.instance.map.startPlacingTower(tower);
         }
     }
 
     void OnMouseEnter()
     {
         //We are still on the menu
-        TowerMenu.instance.mouseHover = true;
+        //TowerMenu.instance.mouseHover = true;
     }
 
     void OnMouseExit()
     {
-        TowerMenu.instance.mouseHover = false;
+        //TowerMenu.instance.mouseHover = false;
     }
 }
 

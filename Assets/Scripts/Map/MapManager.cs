@@ -21,19 +21,23 @@ public enum PlayerState
 }
 
 public class MapManager : MapBase {
+    public static bool gameRunning = false; //Used for pausing or when in map editor
+    public static MapManager instance;
+    //public static uint maxSpeed = 200; //This is the maximum speed a unit can move(Distance between two nodes)
+    public static bool isClient; //When true, check with server for events
+    public static bool isServer; //When true, send network updates to clients
 
     public List<List<MapTile>> grid = new List<List<MapTile>>();
-    public static bool gameRunning = false; //Used for pausing or when in map editor
 
     private Camera mapCam = null;
     private Camera guiCam = null;
-    private TowerMenu towerMenu = null;
     private GameObject towerMouseSprite = null;
 
     private MapTile goalTile = null;
     private MapTile spawnTile = null;
 
     private bool moveCamera = false; //Set to true when moving camera(Middle mouse button down)
+    private bool inputOnGui; //Mouse over gui, ignore input
     private MapTile currentTile = null; //Current tile mouse is hovering over
     private TileHover hoverObj = null;  //GameObject placed over current tile hover
     private TowerBase currentPlaceTower = null; //Tower selected for placing by player
@@ -42,6 +46,11 @@ public class MapManager : MapBase {
     public PathFinder flyingPath = new PFDijkstra4Dir();
 
     public PlayerState currentPlayerState;
+
+    public MapManager()
+    {
+        instance = this;
+    }
 
     void Start()
     {
@@ -62,11 +71,6 @@ public class MapManager : MapBase {
         GameObject hoverPrefab = (GameObject)Resources.Load("GUI/TileHover");
         hoverObj = ((GameObject)Instantiate(hoverPrefab)).GetComponent<TileHover>();
         hoverObj.gameObject.SetActive(false); //Disable it until we hover over a tile
-
-        //Get reference to Tower menu
-        towerMenu = GameObject.Find("TowerMenu").GetComponent<TowerMenu>();
-        if (towerMenu == null)
-            Debug.LogError("Error, could not get towerMenu object!");
 
         //TestMap
         Debug.Log("Loading test map");
@@ -132,183 +136,211 @@ public class MapManager : MapBase {
         Vector3 worldMousePos = mapCam.ScreenToWorldPoint(Input.mousePosition);
         Vector3 guiMousePos = guiCam.ScreenToWorldPoint(Input.mousePosition);
 
+        //Check if we are to check input
+        Camera nguiCam = guiCam;
+        Ray inputRay = nguiCam.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(inputRay.origin, inputRay.direction, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("GUIObj")))
+            inputOnGui = true;
+        else
+            inputOnGui = false;
+
         hoverObj.gameObject.SetActive(false);
 
         if(currentPlayerState == PlayerState.PlacingTower)
         {
             //Make Tower selection follow the mouse
             towerMouseSprite.transform.position = new Vector3(worldMousePos.x, worldMousePos.y, 0);
-            if (towerMenu.mouseHover)
+            if (inputOnGui)
                 Screen.showCursor = true;
             else
                 Screen.showCursor = false;
         }
 
-        //After this point, if the mouse pointer is over the GUI, nothing more will be executed
-        //So place any non-input stuff above this point!
-        //If the mouse pointer is over the Menu, don't do any input on the map(Avoid clicking stuff behind the GUI)
-        if (towerMenu.mouseHover)
-            return;
-
-        //Camera movement
-        if (moveCamera == true)
+        //Handle input outside GUI
+        if (!inputOnGui)
         {
-            mapCam.transform.position -= new Vector3(Input.GetAxisRaw("Mouse X") / 2f, Input.GetAxisRaw("Mouse Y") / 2f);
-            //TODO: Check for borders
-        }
-
-        if (Input.GetMouseButtonDown(2)) //Middle mouse button
-        {
-            Screen.lockCursor = true;
-            moveCamera = true;
-        }
-        else if (Input.GetMouseButtonUp(2))
-        {
-            Screen.lockCursor = false;
-            moveCamera = false;
-        }
-        //Camera Zoom
-        float mouseScroll = Input.GetAxis("Mouse ScrollWheel");
-        if(mouseScroll > 0)
-            mapCam.orthographicSize = Mathf.Max(mapCam.orthographicSize - mouseScroll, 3.5f);
-        else if(mouseScroll < 0)
-            mapCam.orthographicSize = Mathf.Min(mapCam.orthographicSize - mouseScroll, 15f);
-
-        //Tile hover check
-        Vector3 tilePos = worldMousePos - this.transform.position;
-        //1 Unit = 1 tile
-        int tileX = (int)Math.Floor(tilePos.x+0.5f);
-        int tileY = (int)Math.Floor(tilePos.y+0.5f);
-
-        currentTile = getTile(tileX, tileY);
-        if (currentTile != null && moveCamera == false)
-        {
-            if (currentPlayerState == PlayerState.Idle)
+            //Camera movement
+            if (moveCamera == true)
             {
-                //Place hover object on tile
-                hoverObj.gameObject.SetActive(true);
-                hoverObj.transform.parent = currentTile.transform;
-                hoverObj.transform.localPosition = Vector3.zero;
+                mapCam.transform.position -= new Vector3(Input.GetAxisRaw("Mouse X") / 2f, Input.GetAxisRaw("Mouse Y") / 2f);
+                //TODO: Check for borders
             }
-            else if(currentPlayerState == PlayerState.PlacingTower)
-            {
-                //Snap tower selection to grid
-                float offset = (currentPlaceTower.getSize() / 2f) - 0.5f;
-                towerMouseSprite.transform.position = new Vector3(currentTile.transform.position.x + offset, currentTile.transform.position.y + offset);
-            }
-        }
 
-        //Handle mouse click
-        if(Input.GetMouseButtonDown(0))
-        {
-            if(currentTile != null)
+            if (Input.GetMouseButtonDown(2)) //Middle mouse button
             {
-                //Debug.Log("Left click on tile: " + currentTile + "(X:" + currentTile.tileX + " Y:"+ currentTile.tileY + ")");
-                if(currentPlayerState == PlayerState.PlacingTower)
+                Screen.lockCursor = true;
+                moveCamera = true;
+            }
+            else if (Input.GetMouseButtonUp(2))
+            {
+                Screen.lockCursor = false;
+                moveCamera = false;
+            }
+            //Camera Zoom
+            float mouseScroll = Input.GetAxis("Mouse ScrollWheel");
+            if (mouseScroll > 0)
+                mapCam.orthographicSize = Mathf.Max(mapCam.orthographicSize - mouseScroll, 3.5f);
+            else if (mouseScroll < 0)
+                mapCam.orthographicSize = Mathf.Min(mapCam.orthographicSize - mouseScroll, 15f);
+
+            //Tile hover check
+            Vector3 tilePos = worldMousePos - this.transform.position;
+            //1 Unit = 1 tile
+            int tileX = (int)Math.Floor(tilePos.x + 0.5f);
+            int tileY = (int)Math.Floor(tilePos.y + 0.5f);
+
+            currentTile = getTile(tileX, tileY);
+            if (currentTile != null && moveCamera == false)
+            {
+                if (currentPlayerState == PlayerState.Idle)
                 {
-                    int towerSize = currentPlaceTower.getSize();
-                    bool canBuild = true;
-
-                    if (currentPlaceTower is TowerSell)
-                    {
-                        canBuild = false;
-                        //TODO: Implement different selling mechanic, this feels too much like a hack, and can go wrong in so many ways later on
-                        ITileObject obj = currentTile.getMapObject();
-                        if (obj != null && obj is TowerBase)
-                        {
-                            Destroy(obj.getGameObject());
-                            obj.getTileGroup().removeFromGroup();
-
-                            walkingPath.calculatePath();
-                            flyingPath.calculatePath();
-                        }
-                    }
-
-                    for (int x = 0; x < towerSize && canBuild; x++)
-                    {
-                        for (int y = 0; y < towerSize; y++)
-                        {
-                            MapTile checkTile = getTile(currentTile.tileX + x, currentTile.tileY + y);
-                            if(checkTile == null)
-                                continue;
-                            if(!checkTile.canBuild(currentPlaceTower) || checkTile.getMapObject() != null)
-                            {
-                                canBuild = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (canBuild)
-                    {
-                        TowerBase newTower = (TowerBase)createObject(currentPlaceTower.gameObject);
-                        newTower.getTileGroup().setGroup(currentTile, towerSize);
-
-                        //Recalculate all paths
-                        walkingPath.calculatePath();
-                        flyingPath.calculatePath();
-
-                        //See if any mobs now have no path to the end, if so destroy the placed tower(Or deny it in some way)
-                        bool killTower = false;
-                        foreach (Monster monster in Monster.monsters)
-                        {
-                            PathFinder path = monster.getPath();
-                            MapTile nextTile = monster.getNextNode();
-                            if (path == null || nextTile == null)
-                                continue;
-                            PathNodeInfo nextNode = path.getNodeInfo(nextTile);
-                            if (nextNode == null)
-                                continue;
-                            if (nextNode.cost == -1)
-                            {
-                                killTower = true;
-                                break;
-                            }
-                        }
-
-                        //TODO: Check multiple spawns for multiple paths
-                        //checkAllSpawn()
-                        if (walkingPath.getNodeInfo(spawnTile).cost == -1)
-                            killTower = true;
-                        if (flyingPath.getNodeInfo(spawnTile).cost == -1)
-                            killTower = true;
-
-                        if (killTower)
-                        {
-                            Destroy(currentTile.getMapObject().getGameObject());
-                            currentTile.getMapObject().getTileGroup().removeFromGroup();
-
-                            //Recalculate all paths
-                            //TODO: Use function recalculateAllPaths()
-                            walkingPath.calculatePath();
-                            flyingPath.calculatePath();
-                        }
-                    } //canBuild
+                    //Place hover object on tile
+                    hoverObj.gameObject.SetActive(true);
+                    hoverObj.transform.parent = currentTile.transform;
+                    hoverObj.transform.localPosition = Vector3.zero;
+                }
+                else if (currentPlayerState == PlayerState.PlacingTower)
+                {
+                    //Snap tower selection to grid
+                    float offset = (currentPlaceTower.getSize() / 2f) - 0.5f;
+                    towerMouseSprite.transform.position = new Vector3(currentTile.transform.position.x + offset, currentTile.transform.position.y + offset);
                 }
             }
-        }
-        if(Input.GetMouseButtonDown(1))
-        {
-            if (currentPlayerState == PlayerState.PlacingTower)
-                startPlacingTower(null);
+
+            //Handle mouse click
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (currentTile != null)
+                {
+                    //Debug.Log("Left click on tile: " + currentTile + "(X:" + currentTile.tileX + " Y:"+ currentTile.tileY + ")");
+                    if (currentPlayerState == PlayerState.PlacingTower)
+                    {
+                        int towerSize = currentPlaceTower.getSize();
+                        bool canBuild = true;
+
+                        if (currentPlaceTower is TowerSell)
+                        {
+                            canBuild = false;
+                            //TODO: Implement different selling mechanic, this feels too much like a hack, and can go wrong in so many ways later on
+                            ITileObject obj = currentTile.getMapObject();
+                            if (obj != null && obj is TowerBase)
+                            {
+                                Destroy(obj.getGameObject());
+                                obj.getTileGroup().removeFromGroup();
+
+                                walkingPath.calculatePath();
+                                flyingPath.calculatePath();
+                            }
+                        }
+
+                        for (int x = 0; x < towerSize && canBuild; x++)
+                        {
+                            for (int y = 0; y < towerSize; y++)
+                            {
+                                MapTile checkTile = getTile(currentTile.tileX + x, currentTile.tileY + y);
+                                if (checkTile == null)
+                                    continue;
+                                if (!checkTile.canBuild(currentPlaceTower) || checkTile.getMapObject() != null)
+                                {
+                                    canBuild = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (canBuild)
+                        {
+                            TowerBase newTower = (TowerBase)createObject(currentPlaceTower.gameObject);
+                            newTower.getTileGroup().setGroup(currentTile, towerSize);
+
+                            //Recalculate all paths
+                            walkingPath.calculatePath();
+                            flyingPath.calculatePath();
+
+                            //See if any mobs now have no path to the end, if so destroy the placed tower(Or deny it in some way)
+                            bool killTower = false;
+                            foreach (Monster monster in Monster.monsters)
+                            {
+                                PathFinder path = monster.getPath();
+                                MapTile nextTile = monster.getNextNode();
+                                if (path == null || nextTile == null)
+                                    continue;
+                                PathNodeInfo nextNode = path.getNodeInfo(nextTile);
+                                if (nextNode == null)
+                                    continue;
+                                if (nextNode.cost == -1)
+                                {
+                                    killTower = true;
+                                    break;
+                                }
+                            }
+
+                            //TODO: Check multiple spawns for multiple paths
+                            //checkAllSpawn()
+                            if (walkingPath.getNodeInfo(spawnTile).cost == -1)
+                                killTower = true;
+                            if (flyingPath.getNodeInfo(spawnTile).cost == -1)
+                                killTower = true;
+
+                            if (killTower)
+                            {
+                                Destroy(currentTile.getMapObject().getGameObject());
+                                currentTile.getMapObject().getTileGroup().removeFromGroup();
+
+                                //Recalculate all paths
+                                //TODO: Use function recalculateAllPaths()
+                                walkingPath.calculatePath();
+                                flyingPath.calculatePath();
+                            }
+                        } //canBuild
+                    }
+                }
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                if (currentPlayerState == PlayerState.PlacingTower)
+                    startPlacingTower(null);
+            }
         }
 
 
 	}
 
+    //Set a new player state(Unsetting the previous state)
+    private void setPlayerState(PlayerState newState)
+    {
+        //Unset previous state, cleaning up whatever is needed
+        switch (currentPlayerState)
+        {
+            case PlayerState.PlacingTower:
+                Screen.showCursor = true;
+                towerMouseSprite.SetActive(false);
+                break;
+        }
+
+        //Set the new state
+        switch (newState)
+        {
+            case PlayerState.PlacingTower:
+                Screen.showCursor = false;
+                towerMouseSprite.SetActive(true);
+                break;
+        }
+        currentPlayerState = newState;
+    }
+
     public void startPlacingTower(TowerBase tower)
     {
         if(tower == null)
         {
-            currentPlayerState = PlayerState.Idle;
-            towerMouseSprite.SetActive(false);
-            Screen.showCursor = true;
+            setPlayerState(PlayerState.Idle);
             return;
         }
-        currentPlayerState = PlayerState.PlacingTower;
+
+        setPlayerState(PlayerState.PlacingTower);
         currentPlaceTower = tower;
-        towerMouseSprite.SetActive(true);
-        Screen.showCursor = false;
         towerMouseSprite.GetComponent<SpriteRenderer>().sprite = tower.getPlacementSprite();
         towerMouseSprite.transform.localScale = tower.transform.localScale;
     }
