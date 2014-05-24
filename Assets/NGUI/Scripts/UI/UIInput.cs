@@ -27,6 +27,7 @@ public class UIInput : MonoBehaviour
 	}
 
 	public delegate void OnSubmit (string inputString);
+    public delegate void OnTextChanged(string inputString);
 
 	/// <summary>
 	/// Current input, available inside OnSubmit callbacks.
@@ -108,6 +109,12 @@ public class UIInput : MonoBehaviour
 	/// </summary>
 
 	public string functionName = "OnSubmit";
+
+    /// <summary>
+    /// Function that will be called on the event receiver when the input text has changed and the field has lost focus.
+    /// </summary>
+
+    public string functionNameChanged = "OnTextChanged";
 
 	/// <summary>
 	/// Delegate that will be notified when the input field submits its data (by default that's when Enter gets pressed).
@@ -298,6 +305,8 @@ public class UIInput : MonoBehaviour
 				label.showLastPasswordChar = false;
 				Input.imeCompositionMode = IMECompositionMode.Off;
 				RestoreLabel();
+                if (eventReceiver == null) eventReceiver = gameObject;
+                eventReceiver.SendMessage(functionNameChanged, mText, SendMessageOptions.DontRequireReceiver);
 			}
 		}
 	}
@@ -337,6 +346,7 @@ public class UIInput : MonoBehaviour
 				if (onSubmit != null) onSubmit(mText);
 				if (eventReceiver == null) eventReceiver = gameObject;
 				eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
+                eventReceiver.SendMessage(functionNameChanged, mText, SendMessageOptions.DontRequireReceiver);
 				current = null;
 				selected = false;
 			}
@@ -420,6 +430,7 @@ public class UIInput : MonoBehaviour
 						if (onSubmit != null) onSubmit(mText);
 						if (eventReceiver == null) eventReceiver = gameObject;
 						eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
+                        eventReceiver.SendMessage(functionNameChanged, mText, SendMessageOptions.DontRequireReceiver);
 						current = null;
 						selected = false;
 						return;

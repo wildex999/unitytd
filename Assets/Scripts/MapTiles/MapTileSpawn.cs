@@ -11,7 +11,14 @@ public class MapTileSpawn : MapTile {
     private float lastFlyerTime;
     private GameObject Mob1 = null;
     private GameObject Mob2 = null;
+    private CollisionManager collisionManager;
 
+    public override void init(MapManager map, int x, int y)
+    {
+        base.init(map, x, y);
+        if(map != null)
+            map.addSpawn(this);
+    }
 
     void Start()
     {
@@ -30,12 +37,12 @@ public class MapTileSpawn : MapTile {
         if (!MapManager.gameRunning)
             return;
 
+        Vector2Gen<int> fixedPos = new Vector2Gen<int>((int)transform.localPosition.x * 200, (int)transform.localPosition.y * 200);
         lastUnitTime -= Time.deltaTime;
         if (lastUnitTime <= 0f)
         {
             lastUnitTime += timeBetweenSpawns;
-            MapObject mob = map.addObject(MapManager.createObject(Mob1));
-            mob.transform.position = transform.position;
+            MapObject mob = map.addObject(MapManager.createObject(Mob1), fixedPos);
         }
         if(timeToFirstFlyer > 0f)
             timeToFirstFlyer-= Time.deltaTime;
@@ -45,8 +52,7 @@ public class MapTileSpawn : MapTile {
             if(lastFlyerTime <= 0f)
             {
                 lastFlyerTime += timeBetweenFlyers;
-                MapObject mob = map.addObject(MapManager.createObject(Mob2));
-                mob.transform.position = transform.position;
+                MapObject mob = map.addObject(MapManager.createObject(Mob2), fixedPos);
             }
         }
         //Spawn waves

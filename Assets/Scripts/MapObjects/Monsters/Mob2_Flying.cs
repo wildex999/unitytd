@@ -7,7 +7,7 @@ public class Mob2_Flying : Monster
     // Use this for initialization
     public Mob2_Flying()
     {
-        speed = 1.5f;
+        speed = 15;
         health = 10;
         moveType = MonsterMoveType.Flying;
     }
@@ -20,6 +20,11 @@ public class Mob2_Flying : Monster
     // Update is called once per frame
     void Update()
     {
-        followPath();
+        followPathLocal();
+    }
+
+    void FixedUpdate()
+    {
+        followPathFixed();
     }
 }

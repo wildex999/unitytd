@@ -9,6 +9,7 @@
  * */
 
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
@@ -21,7 +22,8 @@ public enum MainServerState
     Connecting,
     Connected,
     LoggingIn,
-    LoggedIn
+    LoggedIn,
+    LoginFailed
 }
 
 public enum GameServerState
@@ -34,6 +36,34 @@ public enum GameServerState
     Connected,
     Joining,
     InGame
+}
+
+//Causes for disconnecting from server
+public enum DisconnectCause
+{
+    LostConnection, //Lost connection to server
+    Timeout, //Timeout while connecting
+    UnknownError, //Disconnecting due to error with no defined cause
+    CorruptMessage, //Got corrupt message
+    UnknownMessageState, //Got unknown results from parsing message
+    NoMessageParser, //No parser found for message
+    Disconnect //Disconnecting due to user action or other normal causes
+}
+
+//Network error resulting in disconnect(Used by events hapening outside main thread)
+//TODO: Expand this to include errors other than disconnects
+public class NetworkError
+{
+    public Socket socket;
+    public DisconnectCause cause;
+    public string message;
+
+    public NetworkError(Socket socket, DisconnectCause cause, string message = "None")
+    {
+        this.socket = socket;
+        this.cause = cause;
+        this.message = message;
+    }
 }
 
 //Data used when sending messages
@@ -49,29 +79,70 @@ public class MessageSendData
     }
 }
 
+public class ReceiveState
+{
+    public Socket socket;
+    public byte[] buffer;
+
+    public ReceiveState(Socket socket, int receiveBufferSize)
+    {
+        this.socket = socket;
+        buffer = new byte[receiveBufferSize];
+    }
+}
+
 public class NetManager : MonoBehaviour
 {
-    Socket mainSocket;
+    private static NetManager instance;
+
+    public static string mainIp = "127.0.0.1";
+    public static int mainPort = 12000;
+
+    public Socket mainSocket;
 
     public MainServerState mainState = MainServerState.NotConnected;
-    public string mainServerError = ""; //Error message for when failing to connect to main server
-    public string gameServerError = ""; //Error message when failing to join game
+
+    //TODO: Implement error list/queue
+    public string mainServerError = ""; //Error messages when dealing with main server
+    public string gameServerError = ""; //Error message when dealing with game server
+    public bool canRegisterLogHandler = true; //Set to true when the log handler needs to be re-registred(Scene change)
 
     private string username = "";
     private bool server = false;
     private bool loggedIn = false;
 
+    private DateTime connectStart; //Set when starting connecting to server, used for timeout
+    private int connectTimeoutTime = 5; //How long in seconds to try to connect before timing out
+
     //Thread locks/messaging
     private ManualResetEvent mainConnectEvent = new ManualResetEvent(false);
     private ManualResetEvent sendMessageLock = new ManualResetEvent(true); //When true, send next message
-    private ConcurrentQueue<Message> messageReceivenQueue = new ConcurrentQueue<Message>(); //Messages from server
-    private ConcurrentQueue<Message> messageSendQueue = new ConcurrentQueue<Message>(); //Messages to server
-    //TODO: Network error queue(I.e failed sends)(Failed send = close socket and disconnect from game/server)
+    public ConcurrentQueue<Message> messageReceiveQueue = new ConcurrentQueue<Message>(); //Messages from server
+    public ConcurrentQueue<Message> messageSendQueue = new ConcurrentQueue<Message>(); //Messages to server
+    private ConcurrentQueue<NetworkError> networkErrorQueue = new ConcurrentQueue<NetworkError>(); //Network errors happening on worker threads(Send/Receive)
+
+    private byte[] receiveBuffer = new byte[0]; //Buffer used for received data while building messages
+
+    //Events
+    public delegate void DisconnectEventHandler(Socket socket, DisconnectCause cause, string message); //Disconnected from main server
+    public event DisconnectEventHandler DisconnectEvent;
+
+    public delegate void GameExitEventHandler(GameManager game, string message); //Exited from current game
+    public event GameExitEventHandler GameExitEvent;
+
+    //Message Events
+    public static Dictionary<MessageCommand, MessageEventBase> messageEvents = new Dictionary<MessageCommand, MessageEventBase>();
+    public delegate void AnyMessageEventHandler(Message message);
+    public event AnyMessageEventHandler AnyMessageEvent; //Event called on every message
+
+    //Add new message event procedure:
+    //1. Create message
+    //2. Register parser in Message.cs static constructor
 
     //Return an instance of netmanager. Create it if it doesn't exist(create=true)
     public static NetManager getNetManager(bool create = true)
     {
-        NetManager manager = GameObject.FindObjectOfType<NetManager>();
+        NetManager manager = instance;
         if(manager == null && create)
         {
             GameObject prefab = Resources.Load<GameObject>("Network/NetworkManager");
@@ -87,6 +158,7 @@ public class NetManager : MonoBehaviour
                 return null;
             }
             manager = newObj.GetComponent<NetManager>();
+            instance = manager;
         }
         return manager;
     }
@@ -103,28 +175,106 @@ public class NetManager : MonoBehaviour
             return;
         }
 
+        //Register event handlers
+        MessageLoginReply.messageEvent += onLoginReply;
+        MessageSendMessage.messageEvent += onMessageInMessage;
+        MessageBroadcast.messageEvent += onMessageInMessage;
+        DisconnectEvent += onDisconnect;
+
         //Connect to main server
-        connectToMainServer("46.9.166.72", 12000);
+        //connectToMainServer("82.194.218.201", 12000);
+        connectToMainServer(mainIp, mainPort);
+
+        registerLogHandler();
+    }
+
+    void OnDestroy()
+    {
+        if (mainSocket != null)
+            mainSocket.Close();
+    }
+
+    void OnLevelWasLoaded(int level)
+    {
+        canRegisterLogHandler = true;
+    }
+
+    private void registerLogHandler()
+    {
+        if (!canRegisterLogHandler)
+            return;
+        //Forward Log output to the main server
+        Application.RegisterLogCallbackThreaded(LogHandler);
+        canRegisterLogHandler = false;
+    }
+
+    public void LogHandler(string logString, string stackTrace, LogType type)
+    {
+        if (mainSocket == null || !mainSocket.Connected)
+            return;
+
+        if (type == LogType.Warning)
+            return;
+
+        MessageLog logMessage;
+        switch(type)
+        {
+            case LogType.Exception:
+                logMessage = new MessageLog("Exception", logString + "\n\n" + stackTrace);
+                break;
+            default:
+                logMessage = new MessageLog(type.ToString(), logString);
+                break;
+        }
+
+        sendMessage(mainSocket, logMessage, false);
     }
 
     void Update()
     {
+        registerLogHandler();
+
         if(mainState == MainServerState.Connecting)
         {
             //Check if we have connected
             if(mainConnectEvent.WaitOne(0))
                 onMainServerConnected();
+
+            //Check if we have reached timeout
+            if((DateTime.Now - connectStart).TotalSeconds > connectTimeoutTime)
+            {
+                mainState = MainServerState.ConnectionFailed;
+                mainServerError = "Timed out while connecting to main server. Server might be offline!";
+                mainSocket.Close();
+            }
+        }
+
+        //Check network error queue
+        //TODO: Handle more than disconnects
+        List<NetworkError> networkErrors = networkErrorQueue.popAll();
+        foreach(NetworkError error in networkErrors)
+        {
+            closeConnection(error.socket, error.cause, error.message);
+
+            //For now we just handle the first error and ignore the rest, since we only handle disconnects.
+            break;
         }
 
         //If done sending previous message, start sending next one
         handleSendingMessage();
+    }
 
+    //Handle new messages before fixed game logic
+    void FixedUpdate()
+    {
         //Check for new messages
+        handleNewMessages();
     }
 
     public bool connectToMainServer(string ip, int port)
     {
-        if (mainSocket != null)
+        Debug.Log("Try connect");
+        if (mainSocket != null && mainSocket.Connected)
             mainSocket.Disconnect(true);
         else
         {
@@ -145,6 +295,7 @@ public class NetManager : MonoBehaviour
         mainState = MainServerState.Connecting;
         mainConnectEvent.Reset();
 
+        connectStart = DateTime.Now;
         mainSocket.BeginConnect(ip, port, new AsyncCallback(callbackConnectToMainServer), mainSocket);
 
         return true;
@@ -179,16 +330,26 @@ public class NetManager : MonoBehaviour
 
         mainState = MainServerState.Connected;
         Debug.Log("Connected to server: " + mainSocket.RemoteEndPoint.ToString());
+
+        //Start setting up receiving of messages
+        ReceiveState receiveState = new ReceiveState(mainSocket, 1500);
+        mainSocket.BeginReceive(receiveState.buffer, 0, receiveState.buffer.Length, 0, new AsyncCallback(callbackReceive), receiveState);
     }
 
     //Try to send message from sending queue
     private void handleSendingMessage()
     {
+        if (!canSend())
+            return; //TODO: Add to network error queue
+
         if(sendMessageLock.WaitOne(0))
         {
             Message message = messageSendQueue.pop();
+
             if (message != null)
             {
+                Debug.LogWarning("Handle send Message: " + message.getCommand());
+
                 byte[] messageData = message.getBytes();
 
                 //Add message length to the front
@@ -202,9 +363,165 @@ public class NetManager : MonoBehaviour
 
                 MessageSendData customData = new MessageSendData(message.socket, sendData);
 
-                Debug.Log("Sending " + sendData.Length + " bytes...");
+                Debug.LogWarning("Sending " + sendData.Length + " bytes(C: " + message.getCommand() + ")");
                 message.socket.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, new AsyncCallback(callbackSendMessage), customData);
             }
+        }
+
+    }
+
+    //Check if connection to main server is in a state to allow sending messages
+    private bool canSend()
+    {
+        if(mainState == MainServerState.Connecting || mainState == MainServerState.ConnectionFailed || mainState == MainServerState.Disconnected
+            || mainState == MainServerState.NotConnected)
+            return false;
+
+        return true;
+    }
+
+    //Get new messages, and call their events
+    private void handleNewMessages()
+    {
+
+        List<Message> newMessages = messageReceiveQueue.popAll();
+        foreach(Message newMessage in newMessages)
+        {
+            if (newMessage == null)
+                Debug.LogError("Got null message on new messages!");
+
+            //Check permissions, so players can not send messages only MainServer is allowed to send
+            if(newMessage.getPermission() == MessagePermission.MainServer && newMessage.senderPlayerId != -1)
+            {
+                Debug.LogError("Got message from player that only MainServer is allowed to send. Command: " + newMessage.getCommand());
+                continue;
+            }
+
+            try
+            {
+                //Call specific handlers first
+                MessageEventBase messageEvent = null;
+                messageEvents.TryGetValue(newMessage.getCommand(), out messageEvent);
+
+                if (messageEvent != null)
+                    messageEvent.Dispatch(newMessage);
+
+                //Call generic handlers last
+                if (AnyMessageEvent != null)
+                    AnyMessageEvent(newMessage);
+            }
+            catch(Exception ex)
+            {
+                Debug.LogException(ex);
+                closeConnection(mainSocket, DisconnectCause.CorruptMessage, "Error while handling network message event(" + newMessage.getCommand() + "). Might be a corrupt game state or network error.\n" + ex.Message);
+                newMessages.Clear();
+                return;
+            }
+        }
+    }
+
+    //Handle new data from socket
+    private void callbackReceive(IAsyncResult ar)
+    {
+        ReceiveState state = (ReceiveState)ar.AsyncState;
+
+        if (!state.socket.Connected)
+            return;
+
+        try
+        {
+            int bytesReceived = state.socket.EndReceive(ar);
+            Debug.Log("Received bytes: " + bytesReceived);
+            if(bytesReceived > 0)
+            {
+                //Create new receiveBuffer, copy remaining old data, copy new buffer data,
+                //and check this new buffer for a message.
+                int newBufferSize = receiveBuffer.Length + bytesReceived;
+                byte[] newBuffer = new byte[newBufferSize];
+                receiveBuffer.CopyTo(newBuffer, 0);
+                Array.Copy(state.buffer, 0, newBuffer, receiveBuffer.Length, bytesReceived);
+                receiveBuffer = newBuffer;
+
+                //Parse buffer to get a message
+                List<Message> parsedList = new List<Message>();
+                Message parsedMessage = null;
+                bool continueParse = true;
+                int messageSize = 0;
+
+                while (continueParse)
+                {
+                    ParseResult parseResult = ParseResult.Corrupt;
+                    try
+                    {
+                        parseResult = Message.parseMessage(receiveBuffer, out parsedMessage, out messageSize);
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.LogException(ex);
+                        closeConnection(mainSocket, DisconnectCause.CorruptMessage, "Error while parsing network message. Might be a corrupt game state or network error.\n" + ex.Message);
+                        return;
+                    }
+
+                    switch (parseResult)
+                    {
+                        case ParseResult.Done:
+                            if (parsedMessage == null)
+                                Debug.LogError("Got null message from parser!");
+                            messageReceiveQueue.push(parsedMessage);
+
+                            //Create a new buffer with the read data removed, as we might have received part or whole of the next message
+                            //TODO: move this outside the while loop to avoid multiple allocations and moving of data when multiple messages received.
+                            messageSize += Message.messageLengthSize; //Include the size prefix
+                            newBuffer = new byte[receiveBuffer.Length - messageSize];
+                            Array.Copy(receiveBuffer, messageSize, newBuffer, 0, receiveBuffer.Length - messageSize);
+                            receiveBuffer = newBuffer;
+
+                            break;
+                        case ParseResult.NeedMoreData:
+                            //Do nothing, let it ask for more data
+                            continueParse = false;
+                            break;
+                        case ParseResult.Corrupt:
+                            //Something went wrong. Break connection and show message
+                            //TODO: Control and show error
+                            continueParse = false;
+                            closeConnection(state.socket, DisconnectCause.CorruptMessage, "Got corrupt message");
+                            break;
+                        case ParseResult.NoParser:
+                            continueParse = false;
+                            closeConnection(state.socket, DisconnectCause.NoMessageParser, "Got message with no parser to handle it!");
+                            break;
+                        default:
+                            Debug.LogError("Got unknown results from parsing message");
+                            continueParse = false;
+                            closeConnection(state.socket, DisconnectCause.UnknownMessageState, "Got unknown results from parsing message!");
+                            break;
+                    }
+                }
+
+            }
+            else
+            {
+                //Got no data, end of connection?
+                Debug.Log("Got no data on receive!");
+            }
+
+            if (state.socket.Connected != true)
+                return; //Stop receiving data
+
+            //Wait for more data
+            mainSocket.BeginReceive(state.buffer, 0, state.buffer.Length, 0, new AsyncCallback(callbackReceive), state);
+        }
+        catch (SocketException ex)
+        {
+            networkErrorQueue.push(new NetworkError(state.socket, DisconnectCause.UnknownError, ex.Message));
+            return;
+        }
+        catch (ObjectDisposedException)
+        {
+            //Connection has been closed
+            networkErrorQueue.push(new NetworkError(state.socket, DisconnectCause.LostConnection));
+            return;
         }
     }
 
@@ -213,23 +530,47 @@ public class NetManager : MonoBehaviour
     {
         //TODO: Make sure we maintain stability with state changes.
         //For example, state change from connected to any non-connected state should always run a socket.disconnect
+
+        //From
+        switch(mainState)
+        {
+            case MainServerState.LoggedIn:
+                loggedIn = false;
+                break;
+        }
+
+        //To
+        switch(newState)
+        {
+            case MainServerState.LoggedIn:
+                loggedIn = true;
+                break;
+        }
+
+        mainState = newState;
     }
 
     //Manage state changes with game server connection
     public void setGameState(GameServerState newState)
     {
-
     }
 
-    public bool sendMessage(Socket target, Message message)
+    public bool sendMessage(Socket target, Message message, bool sendNow = true)
     {
+        Debug.LogWarning("sendMessage1");
+        if (!canSend())
+            return false;
+
         if (!target.Connected)
             throw new Exception("Tried to send message to disconnected socket");
 
         message.socket = target;
         messageSendQueue.push(message);
-        Debug.Log("Queued message for sending");
-        handleSendingMessage(); //Try to send it now
+
+        Debug.LogWarning("SendMessage, Queue: " + messageSendQueue.count());
+
+        if (sendNow)
+            handleSendingMessage(); //Try to send it now
 
         return true;
     }
@@ -239,7 +580,25 @@ public class NetManager : MonoBehaviour
         MessageSendData data = (MessageSendData)ar.AsyncState;
         Socket client = data.socket;
 
-        int bytesSent = client.EndSend(ar);
+        if (!client.Connected)
+            return;
+
+        int bytesSent = 0;
+        try
+        {
+            bytesSent = client.EndSend(ar);
+        }
+        catch(SocketException ex)
+        {
+            networkErrorQueue.push(new NetworkError(client, DisconnectCause.UnknownError, ex.Message));
+            return;
+        }
+        catch(ObjectDisposedException)
+        {
+            //Connection has been closed
+            networkErrorQueue.push(new NetworkError(client, DisconnectCause.LostConnection));
+            return;
+        }
 
         int remainingLength = data.data.Length - bytesSent;
         if (remainingLength > 0)
@@ -248,15 +607,25 @@ public class NetManager : MonoBehaviour
             byte[] remaining = new byte[remainingLength];
             Array.Copy(data.data, bytesSent, remaining, 0, remainingLength);
             data.data = remaining;
-            Debug.Log("Continue to send remaining: " + remainingLength);
+            //Debug.Log("Continue to send remaining: " + remainingLength);
             client.BeginSend(remaining, 0, remaining.Length, SocketFlags.None, new AsyncCallback(callbackSendMessage), data);
         }
         else
         {
             //We are done sending this message
-            Debug.Log("Full message sent");
+            //Debug.Log("Full message sent");
             sendMessageLock.Set();
         }
+    }
+
+    //Send a message to a player in the current game
+    public void gameSendMessage(Player recipient, Message message)
+    {
+        if (GameManager.getGameManager() == null)
+            return;
+
+        MessageSendMessage messageSend = new MessageSendMessage(recipient, message);
+        sendMessage(mainSocket, messageSend);
     }
 
     //Login with the given name
@@ -265,15 +634,86 @@ public class NetManager : MonoBehaviour
         if (mainState != MainServerState.Connected)
             return false;
 
-        Message loginMessage = new MessageLogin(name, "");
+        Message loginMessage = new MessageLogin(name, "loladmin");
         if(!sendMessage(mainSocket, loginMessage))
             return false;
-        mainState = MainServerState.LoggingIn;
+        setMainState(MainServerState.LoggingIn);
+        username = name;
+        Player.setLocalPlayer(new Player(username, -1, Player.PlayerState.Offline));
 
         return true;
     }
 
+    //Login Reply event handler
+    private void onLoginReply(MessageLoginReply message)
+    {
+        if (message.loginOk())
+        {
+            //Update local player
+            Player localPlayer = Player.getLocalPlayer();
+            localPlayer.setId(message.getPlayerId());
+            localPlayer.setState(Player.PlayerState.Online);
+            
+            setMainState(MainServerState.LoggedIn);
+        }
+        else
+        {
+            setMainState(MainServerState.LoginFailed);
+            mainServerError = message.getErrorMessage();
+            Player.setLocalPlayer(null);
+        }
+    }
 
+    //Handler for messages contained inside messages
+    private void onMessageInMessage(Message message)
+    {
+        IMessageInMessage container = message as IMessageInMessage;
+        if (container == null)
+            return;
+
+        messageReceiveQueue.push(container.getMessage());
+    }
+
+    //Close connection with closing message
+    private void closeConnection(Socket socket, DisconnectCause cause, string message = "No reason")
+    {
+        if(cause == DisconnectCause.LostConnection)
+            message = "Lost connection to server!";
+
+        //Inform event handlers of disconnect
+        if (DisconnectEvent != null)
+            DisconnectEvent(socket, cause, message);
+
+        socket.Close();
+    }
+
+    //Handle main server disconnects
+    private void onDisconnect(Socket socket, DisconnectCause cause, string message)
+    {
+        MessageBox.createMessageBox("Network Error", message);
+
+        Debug.Log("Cause: " + cause);
+
+        //Logout player
+        Player.setLocalPlayer(null);
+
+        if (socket != mainSocket)
+            return;
+
+        switch(cause)
+        {
+            case DisconnectCause.Disconnect:
+                mainState = MainServerState.NotConnected;
+                break;
+            case DisconnectCause.LostConnection:
+                mainState = MainServerState.Disconnected;
+                break;
+            default:
+                mainState = MainServerState.ConnectionFailed;
+                mainServerError = message;
+                break;
+        }
+    }
 
     public string getUsername()
     {

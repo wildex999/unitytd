@@ -8,6 +8,7 @@ public class TowerItem : MonoBehaviour
 {
 
     public TowerBase tower;
+    private MapManager map;
 
     void Start()
     {
@@ -50,6 +51,10 @@ public class TowerItem : MonoBehaviour
 
     void OnClick()
     {
-        MapManager.instance.startPlacingTower(tower);
+        MapManager map = MapManager.getMapManager();
+        if (map == null)
+            return;
+
+        map.startPlacingTower(tower);
     }
 }

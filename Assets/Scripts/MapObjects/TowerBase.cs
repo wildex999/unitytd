@@ -1,11 +1,16 @@
 ﻿
 
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
-public abstract class TowerBase : Building, ITileObject
+public abstract class TowerBase : Building, ITileObject, ICollideHandler
 {
     protected TileGroup tileGroup;
     protected Monster currentTarget;
     protected GameObject currentTargetObj; //Store GameObject to avoid GetCompontent calls
+
+    public FixedCircleCollider fixedCollider;
+    public int colliderRadius = (int)MapBase.unitSizeFixed;
 
     public abstract string getName(); //Name of tower, used in tower menu and when showing tower info
     public abstract string getDescription(); //Description, same as name
@@ -32,6 +37,16 @@ public abstract class TowerBase : Building, ITileObject
         tileGroup = new TileGroup(this);
     }
 
+    void Awake()
+    {
+        updateCollider();
+    }
+
+    protected virtual void updateCollider()
+    {
+        fixedCollider = new FixedCircleCollider(this, colliderRadius);
+    }
+
     public virtual bool canMonsterPass(Monster mob)
     {
         if (mob.getMoveType() == MonsterMoveType.Walking)
@@ -40,11 +55,6 @@ public abstract class TowerBase : Building, ITileObject
     }
 
     //Tile
-    public GameObject getGameObject()
-    {
-        return gameObject;
-    }
-
     public TileGroup getTileGroup()
     {
         return tileGroup;
@@ -80,12 +90,14 @@ public abstract class TowerBase : Building, ITileObject
 
 
     //Detection
+    public virtual void handleCollisionEnter(FixedCollider other)
+    {
+    }
 
-    //The class inheriting from this class can overide these functions by redefining them
-    void OnTriggerStay2D(Collider2D other)
+    public virtual void handleCollisionContinue(FixedCollider other)
     {
         //TODO: Implement different targeting:
-        //Closest: Check every object in range if closest(DOn't to it every frame, once a seocnd?)
+        //Closest: Check every object in range if closest(Don't to it every frame, once a seocnd?)
         //Front: Target object that is closest to the end(I.e at the front), check the cost of the current node they are walking towards.
         //Weakest
         //Strongest
@@ -93,20 +105,71 @@ public abstract class TowerBase : Building, ITileObject
         //For now we just target the first one to enter our range since previous target went out
         if (currentTarget == null)
         {
-            currentTarget = other.gameObject.GetComponent<Monster>();
+            currentTarget = other.handler.getGameObject().GetComponent<Monster>();
             //If the other object is not of type Monster, currentTarget will be set to null
-            //TODO: Use layers to reduce tower->tower false positives?
             if (currentTarget != null)
-                currentTargetObj = other.gameObject;
+                currentTargetObj = other.handler.getGameObject();
         }
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    public virtual void handleCollisionExit(FixedCollider other)
     {
-        if (other.gameObject == currentTargetObj)
+        if (!other.handler.isValid() || other.handler.getGameObject() == currentTargetObj)
         {
             currentTarget = null;
             currentTargetObj = null;
         }
     }
+
+    public bool isValid()
+    {
+        if (gameObject == null)
+            return false;
+        return true;
+    }
+
+    //Place a tower of the given prefab, on the given tile(s) and return a copy
+    public virtual T createTower<T>(MapTile tile, T prefab) where T : TowerBase
+    {
+        MapManager map = tile.getMapManager();
+        T newTower = (T)MapBase.createObject(prefab.gameObject);
+        newTower.getTileGroup().setGroup(tile, prefab.getSize());
+
+        //Recalculate all paths
+        map.calculatePaths(MonsterMoveType.Unknown);
+
+        return newTower;
+    }
+
+    //Remove the current tower
+    public virtual void removeTower()
+    {
+        Destroy(gameObject);
+        getTileGroup().removeFromGroup();
+
+        //Recalculate all paths
+        map.calculatePaths(MonsterMoveType.Unknown);
+    }
+
+    //Check if space is free for tower to be built
+    public virtual bool canBuild(MapTile tile)
+    {
+        int towerSize = getSize();
+        MapManager map = tile.getMapManager();
+
+        for (int x = 0; x < towerSize; x++)
+        {
+            for (int y = 0; y < towerSize; y++)
+            {
+                MapTile checkTile = map.getTile(tile.tileX + x, tile.tileY + y);
+                if (checkTile == null)
+                    return false;
+
+                if (!checkTile.canBuild(this) || checkTile.getMapObject() != null)
+                    return false;
+            }
+        }
+        return true;
+    }
+
 }

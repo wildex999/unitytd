@@ -36,6 +36,11 @@ public class TestTower : TowerBase
             bulletTimer = 0f;
     }
 
+    public void FixedUpdate()
+    {
+
+    }
+
     public override string getName()
     {
         return displayName;

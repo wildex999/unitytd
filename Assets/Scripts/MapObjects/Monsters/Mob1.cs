@@ -10,6 +10,11 @@ public class Mob1 : Monster {
 	
 	// Update is called once per frame
 	void Update () {
-        followPath();
+        followPathLocal();
 	}
+
+    void FixedUpdate()
+    {
+        followPathFixed();
+    }
 }

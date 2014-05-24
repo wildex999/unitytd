@@ -15,7 +15,6 @@ public class PFDijkstra4Dir : PathFinder
 
     private PathNodeInfo target;
     private IPathable pathObj;
-    private bool calculated;
     private MapManager map;
     private uint age; //Used during recalculation
 
@@ -23,7 +22,6 @@ public class PFDijkstra4Dir : PathFinder
     {
         nodes = new Dictionary<string, PathNodeInfo>(); //stores with the string( x + "-" + y, I.e 10-5)
         openList = new SortedList<PathNodeInfo, PathNodeInfo>(new PathCostCompare());
-        calculated = false;
 
         this.target = new PathNodeInfo(target);
         this.pathObj = pathObj;

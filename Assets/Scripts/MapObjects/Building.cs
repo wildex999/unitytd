@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Building : MapObject {
+public abstract class Building : MapObject {
 }

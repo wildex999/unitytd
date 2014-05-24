@@ -1,20 +1,41 @@
-﻿
+﻿using UnityEngine;
 
 //The return from a login request is an player id(-1 if error) and an error string(Empty if no error)
 public class MessageLoginReply : Message
 {
-    private uint playerId;
+    public static MessageCommand thisCommand = MessageCommand.LoginReply;
+    public static MessageEvent<MessageLoginReply> messageEvent = new MessageEvent<MessageLoginReply>();
+
+    private int playerId;
     private string errorMsg;
 
-    //Parsing constructor
+    //Parse stream
     public MessageLoginReply(DataStream stream)
-        : base(MessageCommand.LoginReply, stream)
+        : base(thisCommand, stream)
     {
-        //Parse the data stream
-        playerId = stream.readUInt();
+        playerId = stream.readInt();
+        Debug.Log("Player Id: " + playerId);
+        if(playerId == -1)
+        {
+            errorMsg = stream.readStringUTF8();
+            Debug.Log("Login error: " + errorMsg);
+        }
     }
 
-    public uint getPlayerId()
+    //Register the message
+    public static void registerMessage()
+    {
+        Message.messageParsers.Add(thisCommand, parseMessage);
+        NetManager.messageEvents[thisCommand] = messageEvent;
+    }
+
+    public static Message parseMessage(DataStream data)
+    {
+        Message parsedMessage = new MessageLoginReply(data);
+        return parsedMessage;
+    }
+
+    public int getPlayerId()
     {
         return playerId;
     }

@@ -66,10 +66,11 @@ public class TileGroup
         //Move to middle of tile group
         if(position)
         {
-            //Since the tiles are side by side, we don't need to get all their actualy positions(1 tile always = 1 unit)
-            float offset = (size / 2f) - 0.5f;
-            obj.getGameObject().transform.parent = baseTile.transform;
-            obj.getGameObject().transform.localPosition = new Vector3(offset, offset);
+            //Since the tiles are side by side, we don't need to get all their actual positions(1 tile always = 1 unit)
+            int halfUnit = (int)MapBase.unitSizeFixed / 2;
+            int offset = (size * halfUnit) - halfUnit;
+
+            obj.init(baseTile.map, new Vector2Gen<int>(offset, offset), baseTile);
         }
     }
 

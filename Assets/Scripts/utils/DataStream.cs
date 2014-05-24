@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using UnityEngine;
 
 
 //Class for easy reading of a bytestream
+//TODO: Just move on to MemoryStream and BinaryReader
 
 public class DataStream
 {
     private byte[] data;
+    private List<byte[]> writeList; //Data to be written
     private int offset; //Current offset in message data
 
     public DataStream(byte[] data)
@@ -40,7 +45,16 @@ public class DataStream
 
     public byte[] readBytes()
     {
-        return null;
+        int byteSize = BitConverter.ToInt32(data, offset);
+        offset += 4;
+        //TODO: Security: Set limit on byteSize so as not to crash the computer(If that can happen with for example a 2GB allocation from int)
+        byte[] readData = new byte[byteSize];
+
+        Array.Copy(data, offset, readData, 0, byteSize);
+
+        offset += byteSize;
+
+        return readData;
     }
 
     public short readShort()
@@ -78,5 +92,22 @@ public class DataStream
         uint outData = BitConverter.ToUInt32(data, offset);
         offset += 4;
         return outData;
+    }
+
+    public static string readStreamStringUTF8(BinaryReader reader)
+    {
+        ushort strLength = reader.ReadUInt16();
+        byte[] strBytes = reader.ReadBytes(strLength);
+        string outString = Encoding.UTF8.GetString(strBytes);
+
+        return outString;
+    }
+
+    //Write string to binary stream
+    public static void writeStringUTF8ToStream(BinaryWriter stream, string str)
+    {
+        byte[] strBytes = Encoding.UTF8.GetBytes(str);
+        stream.Write((ushort)strBytes.Length);
+        stream.Write(strBytes);
     }
 }

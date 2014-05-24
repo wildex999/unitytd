@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.IO;
+using System.Text;
 
 /*
  * The Map manager for the Map Editor
@@ -23,6 +25,8 @@ public class EditorMap : MapBase {
     public Camera groundCamera; //Draw the ground
     public UICamera guiCamera;
 
+    public UIInput mapNameInput;
+
     public static EditorMap instance;
     public GameObject placeHover; //Sprite hovering at the mouse position when placing tiles or graphics.
 
@@ -33,16 +37,22 @@ public class EditorMap : MapBase {
     private bool inputOnGui; //Mouse over gui, ignore input
     private bool moveCamera = false;
 
+
     public EditorMap()
     {
         instance = this;
         editorState = EditorState.None;
+        mapInfo = new MapInfo();
     }
 
 	// Use this for initialization
 	void Start () {
         placeHover.SetActive(false);
+        mapNameInput.text = mapInfo.name;
         GA.API.Design.NewEvent("ALPHA2:GAME:StartMapEditor");
+
+        MessageBox.createMessageBox("Warning", "Please note that the Map file format is currently under heavy iteration, and any maps saved will therefore most likely not be loadable in the next version!\n" +
+                                                "Only use the Map editor for testing!");
 	}
 	
 	// Update is called once per frame
@@ -160,6 +170,7 @@ public class EditorMap : MapBase {
                     Debug.LogError("Failed to get MapTile from gameobject during place: " + currentPlaceTile);
                     return;
                 }
+                newTile.prefab = currentPlaceTile.gameObject;
 
                 setTile(tileX, tileY, newTile);
             }
@@ -213,7 +224,7 @@ public class EditorMap : MapBase {
         return tile;
     }
 
-    public override MapObject addObject(MapObject obj)
+    public override MapObject addObject(MapObject obj, Vector2Gen<int> fixedPosition)
     {
         throw new System.NotImplementedException();
     }
@@ -221,5 +232,166 @@ public class EditorMap : MapBase {
     public override void removeObject(MapObject obj)
     {
         throw new System.NotImplementedException();
+    }
+
+    public override uint getSizeFixed()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override float getSize()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void OnMapNameSubmit(string newName)
+    {
+        mapInfo.name = newName;
+    }
+
+    //Return the current map file
+    public string getCurrentMapFile()
+    {
+        return mapInfo.filename;
+    }
+
+    public MapInfo getMapInfo()
+    {
+        return mapInfo;
+    }
+
+    //Start a new map
+    public void newMap()
+    {
+        clearMap();
+    }
+
+    public void doLoadMap(string filename)
+    {
+        if (filename.EndsWith(".utdmap"))
+            filename = filename.Remove(filename.LastIndexOf(".utdmap")); //Remove if it already exists
+
+        FileStream mapFile = null;
+        try 
+        {
+            mapFile = File.Open(MapInfo.getMapsPath() + "/" + filename + ".utdmap", FileMode.Open);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.createMessageBox("Error loading map", "Unable to open file: \n" + ex.Message, NGUITools.GetRoot(gameObject));
+            return;
+        }
+
+        //Clear existing map
+        newMap();
+
+        BinaryReader reader = new BinaryReader(mapFile);
+        loadMap(reader);
+
+        Debug.Log("Loaded map!");
+    }
+
+    //Initiate saving the current map
+    public void doSaveMap(string filename)
+    {
+        DirectoryInfo mapsPath = new DirectoryInfo(MapInfo.getMapsPath());
+        if (!mapsPath.Exists)
+            mapsPath.Create();
+
+        if (filename.EndsWith(".utdmap"))
+            filename = filename.Remove(filename.LastIndexOf(".utdmap")); //Remove if it already exists
+
+        FileStream mapFile = null;
+        try
+        {
+            mapFile = File.Open(MapInfo.getMapsPath() + "/" + filename + ".utdmap", FileMode.Create);
+        }
+        catch(Exception ex)
+        {
+            MessageBox.createMessageBox("Error", "Got error while opening file for saving!\n" + ex.Message, NGUITools.GetRoot(gameObject));
+            return;
+        }
+
+        byte[] mapData = saveMap();
+
+        mapFile.Write(mapData, 0, mapData.Length);
+
+        mapFile.Close();
+
+        Debug.Log("Write complete!");
+    }
+
+    //Write map to byte array
+    private byte[] saveMap()
+    {
+        MemoryStream stream = new MemoryStream();
+        BinaryWriter writer = new BinaryWriter(stream);
+
+        DataStream.writeStringUTF8ToStream(writer, mapInfo.name);
+        writer.Write(++mapInfo.version);
+        //TODO: If saving to online, write current user id(Used for publishing)
+        writer.Write(mapInfo.userId);
+        DataStream.writeStringUTF8ToStream(writer, mapInfo.ownerName);
+        writer.Write(mapInfo.recommendedPlayers);
+        writer.Write(mapInfo.minimumPlayers);
+        DataStream.writeStringUTF8ToStream(writer, mapInfo.description);
+
+        //Get Min and Max X/Y
+        int minX = 0;
+        int minY = 0;
+        int maxX = 0; //Used to update map size
+        int maxY = 0;
+        foreach(KeyValuePair<string, MapTile> pair in tiles)
+        {
+            MapTile tile = pair.Value;
+            if (tile.tileX < minX)
+                minX = tile.tileX;
+            else if (tile.tileX > maxX)
+                maxX = tile.tileX;
+
+            if (tile.tileY < minY)
+                minY = tile.tileY;
+            else if (tile.tileY > maxY)
+                maxY = tile.tileY;
+        }
+        Debug.Log("Min: " + (-minX) + " | " + (-minY));
+
+        mapInfo.sizeX = (-minX) + maxX + 1;
+        mapInfo.sizeY = (-minY) + maxY + 1;
+
+        if(tiles.Count == 0)
+        {
+            mapInfo.sizeX = 0;
+            mapInfo.sizeY = 0;
+        }
+
+        Debug.Log("Map size: " + mapInfo.sizeX + " | " + mapInfo.sizeY);
+
+        writer.Write(mapInfo.sizeX);
+        writer.Write(mapInfo.sizeY);
+        writer.Write(mapInfo.editorVersion); //TODO: Set new editorversion
+
+        //Write the tiles
+        //TODO: Use tile system described in MapBase loadmap.
+        for (int y = minY; y <= maxY; y++)
+        {
+            for(int x = minX; x <= maxX; x++)
+            {
+                string tileStr = x + "-" + y;
+                MapTile tile;
+                tiles.TryGetValue(tileStr, out tile);
+                
+                if (tile == null)
+                {
+                    writer.Write((int)0); //Write 0(No tile)
+                    continue;
+                }
+
+                writer.Write(tile.getUniqueId()); //Write the id
+                tile.writeToStream(writer); //Let the tile write any extra data it requires
+            }
+        }
+        
+        return stream.ToArray();
     }
 }
