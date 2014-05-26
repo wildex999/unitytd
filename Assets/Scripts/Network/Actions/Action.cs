@@ -12,7 +12,8 @@ using UnityEngine;
 
 public enum Actions
 {
-    PlaceTower
+    PlaceTower,
+    PlaceTowerFailed,
 }
 
 public abstract class Action
@@ -37,7 +38,8 @@ public abstract class Action
         {
             case Actions.PlaceTower:
                 return new ActionPlaceTower(stream, action, player, game, out valid);
-
+            case Actions.PlaceTowerFailed:
+                return new ActionPlaceTowerFailed(stream, action, player, game, out valid);
         }
         valid = false;
         return null;

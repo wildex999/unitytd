@@ -3,6 +3,7 @@
 //When the server replies either with failure, or with a tower placement, this Dummy is replaced.
 //TODO: Show tower with 0.5 alpha transparency
 
+using UnityEngine;
 public class DummyTower : TowerBase
 {
     private TowerBase original;
@@ -10,6 +11,21 @@ public class DummyTower : TowerBase
     public void setOriginal(TowerBase tower)
     {
         original = tower;
+        SpriteRenderer rend = this.GetComponent<SpriteRenderer>();
+        rend.sprite = tower.GetComponent<SpriteRenderer>().sprite;
+        rend.color = new Color(rend.color.r, rend.color.g, rend.color.b, 0.3f);
+        transform.localScale = tower.transform.localScale;
+    }
+
+    public void OnDestroy()
+    {
+        Debug.Log("DUMMY DESTROYED");
+    }
+
+    //Make sure the dummy doesn't affect the pathfinding
+    public override bool canMonsterPass(Monster mob)
+    {
+        return true;
     }
 
     public override string getName()
@@ -22,7 +38,7 @@ public class DummyTower : TowerBase
         return original.getDescription();
     }
 
-    public override uint getPrice()
+    public override int getPrice()
     {
         return 0;
     }
@@ -67,7 +83,12 @@ public class DummyTower : TowerBase
         return false;
     }
 
-    public override float sellValue()
+    public override FInt sellValue()
+    {
+        return 0;
+    }
+
+    public override int getSyncHash()
     {
         return 0;
     }

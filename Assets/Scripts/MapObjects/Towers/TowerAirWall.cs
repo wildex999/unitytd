@@ -26,7 +26,7 @@ public class TowerAirWall : TowerBase
         return "This tower is weird...\nIn production since they day we lost gravity!";
     }
 
-    public override uint getPrice()
+    public override int getPrice()
     {
         return 5;
     }
@@ -68,11 +68,11 @@ public class TowerAirWall : TowerBase
 
     public override bool canSell()
     {
-        throw new System.NotImplementedException();
+        return true;
     }
 
-    public override float sellValue()
+    public override FInt sellValue()
     {
-        throw new System.NotImplementedException();
+        return FInt.FromParts(0, 500);
     }
 }

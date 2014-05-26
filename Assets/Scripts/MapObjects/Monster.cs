@@ -49,8 +49,14 @@ public class Monster : MapObject, IPathable, ICollideHandler {
         if (health <= 0)
         {
             GA.API.Design.NewEvent("ALPHA1:GAME:MonsterKilled", transform.position);
+            onKilled();
             Destroy(gameObject);
         }
+    }
+
+    public virtual void onKilled()
+    {
+        map.getGameManager().Money += 1;
     }
 
     //Add a effect on this monster(Slow, Freeze, Rampage etc.)
@@ -179,6 +185,7 @@ public class Monster : MapObject, IPathable, ICollideHandler {
                 {
                     //Reached goal
                     movementRemain = 0;
+                    map.getGameManager().Lives -= 1; //TODO: Allow to define how much a mob is worth(Can be dynamic depending on health)
                     GA.API.Design.NewEvent("ALPHA1:GAME:MonsterReachedCastle");
                     Destroy(gameObject);
                 }

@@ -34,8 +34,7 @@ public class GameInfoLabel : MonoBehaviour {
         List<Player> players = message.getPlayers();
         label.text = "Owner: " + message.getOwner().getName() + "\n" +
             "Map: " + message.getMapName() + "\n" +
-            "Players(" + (players.Count+1) + "/" + message.getMaxPlayers() + ")";
-        label.text += "\n    -" + message.getOwner().getName();
+            "Players(" + (players.Count) + "/" + message.getMaxPlayers() + ")";
         foreach(Player player in players)
             label.text += "\n    -" + player.getName();
     }

@@ -14,7 +14,7 @@ public abstract class TowerBase : Building, ITileObject, ICollideHandler
 
     public abstract string getName(); //Name of tower, used in tower menu and when showing tower info
     public abstract string getDescription(); //Description, same as name
-    public abstract uint getPrice(); //Cost of the tower
+    public abstract int getPrice(); //Cost of the tower
 
     public abstract Sprite getMenuSprite(); //Sprite to show while in the menu
     public abstract Sprite getPlacementSprite(); //Sprite to show while placing tower
@@ -28,7 +28,7 @@ public abstract class TowerBase : Building, ITileObject, ICollideHandler
     public abstract string getLockReason(); //Return an explanation on why the tower is locked, and how to unlock it
 
     public abstract bool canSell(); //Whether or not the tower can be sold
-    public abstract float sellValue(); //Percentage(0 to 1) of max price is returned on sell
+    public abstract FInt sellValue(); //Percentage(0 to 1) of max price is returned on sell
 
     //TODO: Upgrade options 
 
@@ -136,26 +136,33 @@ public abstract class TowerBase : Building, ITileObject, ICollideHandler
     }
 
     //Place a tower of the given prefab, on the given tile(s) and return a copy
-    public virtual T createTower<T>(MapTile tile, T prefab) where T : TowerBase
+    public virtual T createTower<T>(MapTile tile, T prefab, bool dummy = false) where T : TowerBase
     {
         MapManager map = tile.getMapManager();
         T newTower = (T)MapBase.createObject(prefab.gameObject);
+
+        //Remove dummy tower if it's there
+        if(tile.getMapObject() != null && tile.getMapObject() is DummyTower)
+            Destroy(tile.getMapObject().getGameObject());
+
         newTower.getTileGroup().setGroup(tile, prefab.getSize());
 
         //Recalculate all paths
-        map.calculatePaths(MonsterMoveType.Unknown);
+        if(!dummy)
+            map.calculatePaths(MonsterMoveType.Unknown);
 
         return newTower;
     }
 
     //Remove the current tower
-    public virtual void removeTower()
+    public virtual void removeTower(bool dummy = false)
     {
         Destroy(gameObject);
         getTileGroup().removeFromGroup();
 
         //Recalculate all paths
-        map.calculatePaths(MonsterMoveType.Unknown);
+        if(!dummy)
+            map.calculatePaths(MonsterMoveType.Unknown);
     }
 
     //Check if space is free for tower to be built

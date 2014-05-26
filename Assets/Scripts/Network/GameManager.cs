@@ -54,6 +54,12 @@ public class GameManager : MonoBehaviour
     private string gameName = "";
     private int maxPlayers = 1;
 
+    //Temp Lives and money. Move this into per player/per team
+    private int lives;
+    private int money;
+    private UILabel livesLabel;
+    private UILabel moneyLabel;
+
     private Dictionary<uint, List<Action>> actionQueue = new Dictionary<uint, List<Action>>(); //Actions to be performed for specific tick
     public List<Action> outgoingActions = new List<Action>(); //Actions performed this step which are to be sent(Authorative)
     private Dictionary<uint, int> hashHistory = new Dictionary<uint, int>(); //Hash history for the different steps
@@ -155,11 +161,15 @@ public class GameManager : MonoBehaviour
         MessageGameState.messageEvent -= onSetGameState;
         MessageGameTick.messageEvent -= onAuthorativeGameTick;
         MessageAction.messageEvent -= onAction;
+        MessageSyncCheck.messageEvent -= onSyncCheck;
         GameChatInput.ChatEvent -= onChatInput;
 
         if (net == null)
             return;
+
         net.DisconnectEvent -= OnDisconnect;
+
+        net.setGame(null);
     }
 
     //Called on joining game(For now called by the join button code)
@@ -186,6 +196,18 @@ public class GameManager : MonoBehaviour
 
             normalExit = true;
             Application.LoadLevel(0);
+        }
+
+        //Temp: Get Money and lives label
+        //TODO: Move this on to a better system
+        if(moneyLabel == null)
+        {
+            GameObject obj = GameObject.FindGameObjectWithTag("MoneyLabel");
+            if (obj != null)
+                moneyLabel = obj.GetComponent<UILabel>();
+            obj = GameObject.FindGameObjectWithTag("LivesLabel");
+            if (obj != null)
+                livesLabel = obj.GetComponent<UILabel>();
         }
 
         //When game is paused, we still need to update GameManager
@@ -219,7 +241,7 @@ public class GameManager : MonoBehaviour
             currentFixedStep++;
 
             //Perform all queued actions
-            List<Action> currentActions = actionQueue[currentFixedStep];
+            List<Action> currentActions = getActions(currentFixedStep);
             foreach (Action action in currentActions)
                 action.run();
 
@@ -251,7 +273,6 @@ public class GameManager : MonoBehaviour
             if((currentFixedStep % MapBase.simFramerate) == 0)
             {
                 int hash = getMapHash();
-                
                 //Store it for later comparison
                 hashHistory[currentFixedStep] = hash;
             }
@@ -285,8 +306,7 @@ public class GameManager : MonoBehaviour
 
                 //TODO: Can server skip steps? If so this might throw. For example if joining game in progress.
                 //List<Action> currentActions = actionQueue[currentFixedStep];
-                List<Action> currentActions;
-                actionQueue.TryGetValue(currentFixedStep, out currentActions);
+                List<Action> currentActions = getActions(currentFixedStep);
                 if (currentActions != null)
                 {
                     //Perform queued actions
@@ -496,9 +516,9 @@ public class GameManager : MonoBehaviour
 
         //The action should itself verify permissions, so we simply queue the action for next tick
         if (isAuthorative)
-            actionQueue[currentFixedStep + 1].Add(theAction);
+            getActions(currentFixedStep + 1).Add(theAction);
         else
-            actionQueue[serverFixedStep + 1].Add(theAction);
+            getActions(serverFixedStep + 1).Add(theAction);
     }
 
     void onSyncCheck(MessageSyncCheck message)
@@ -535,7 +555,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        Debug.Log("Got chat: " + message.getMessage() + " Output: " + currentChatOutput);
+        //Debug.Log("Got chat: " + message.getMessage() + " Output: " + currentChatOutput);
 
         string chatMessage = message.getMessage();
         //TODO: Filter message for bad stuff
@@ -550,7 +570,7 @@ public class GameManager : MonoBehaviour
         if (net == null)
             return;
 
-        Debug.Log("Send chat message");
+        //Debug.Log("Send chat message");
 
         //Broadcast to all players
         MessageChat chatMessage = new MessageChat(message, false);
@@ -629,6 +649,10 @@ public class GameManager : MonoBehaviour
                     currentFixedStep = 0;
                     serverFixedStep = 0;
                 }
+
+                Lives = 100;
+                Money = 10000;
+
                 break;
         }
 
@@ -647,6 +671,7 @@ public class GameManager : MonoBehaviour
         //TODO: Handle online map
 
         //Load local map
+        Debug.Log("LOADMAP");
         AsyncFileReader mapLoader = new AsyncFileReader(MapInfo.getMapsPath() + newMap.filename);
         byte[] mapData = mapLoader.getData();
         if(mapData == null)
@@ -736,6 +761,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public int Lives
+    {
+        get { return lives; }
+        set 
+        {
+            lives = value;
+            if (livesLabel != null)
+                livesLabel.text = "[B40404]Lives:[-] " + lives; 
+        }
+    }
+
+    public int Money
+    {
+        get { return money; }
+        set
+        {
+            money = value;
+            if (moneyLabel != null)
+                moneyLabel.text = "[FACC2E]Money:[-] " + money;
+        }
+    }
+
     public MapManager getMap()
     {
         return map;
@@ -755,6 +802,17 @@ public class GameManager : MonoBehaviour
     }
 
     //--In-Game Actions--
+
+    public List<Action> getActions(uint step)
+    {
+        List<Action> list;
+        if(!actionQueue.TryGetValue(step, out list))
+        {
+            list = new List<Action>();
+            actionQueue[step] = list;
+        }
+        return list;
+    }
 
     //Queue the action for next step
     public void queueAction(Action action)

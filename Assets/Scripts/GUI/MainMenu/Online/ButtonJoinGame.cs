@@ -24,8 +24,6 @@ public class ButtonJoinGame : MonoBehaviour
         if (net == null || !net.isLoggedIn())
             return;
 
-        Debug.Log("ClickJoin");
-
         //Listen for disconnects during the process
         net.DisconnectEvent += OnDisconnect;
 

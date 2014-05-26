@@ -78,9 +78,9 @@ public class ActionPlaceTower : Action
     {
         MapManager map = game.getMap();
 
-        Debug.Log("TOWER PLACE ON STEP: " + game.getCurrentFixedStep());
+        //Debug.Log("TOWER PLACE ON STEP: " + game.getCurrentFixedStep());
         Monster lastMonster = Monster.monsters.Last.Value;
-        Debug.Log("Monster count: " + Monster.monsters.Count + " Last Monster: " + lastMonster + " X: " + lastMonster.getFixedPosition().x + " Y: " + lastMonster.getFixedPosition().y);
+        //Debug.Log("Monster count: " + Monster.monsters.Count + " Last Monster: " + lastMonster + " X: " + lastMonster.getFixedPosition().x + " Y: " + lastMonster.getFixedPosition().y);
 
         //If we are server
         if(game.isAuthorative) 
@@ -94,7 +94,9 @@ public class ActionPlaceTower : Action
             {
                 if(player != game.thisPlayer)
                 {
-                    //TODO: Send failure message to client
+                    //Send failure message to client
+                    Action failureAction = new ActionPlaceTowerFailed(game, tile);
+                    game.getNetManager().sendAction(failureAction, placingPlayer);
                 }
             }
         }

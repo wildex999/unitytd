@@ -46,7 +46,7 @@ public class TestTower : TowerBase
         return "Your everyday basic Test Tower!\nFree air included with every 10th purchase.";
     }
 
-    public override uint getPrice()
+    public override int getPrice()
     {
         return 10;
     }
@@ -82,9 +82,9 @@ public class TestTower : TowerBase
         return true;
     }
 
-    public override float sellValue()
+    public override FInt sellValue()
     {
-        return 0.5f;
+        return FInt.FromParts(0, 500);
     }
 
     public override Sprite getMenuSprite()

@@ -32,6 +32,7 @@ public class MapManager : MapBase {
     private Camera mapCam = null;
     private Camera guiCam = null;
     private GameObject towerMouseSprite = null;
+    private DummyTower dummyTowerPrefab;
 
     private MapTile goalTile = null;
     List<MapTile> spawns = new List<MapTile>();
@@ -94,6 +95,12 @@ public class MapManager : MapBase {
         if (towerMouseSprite == null)
             Debug.LogError("Could not find TowerMouseSprite!");
         towerMouseSprite.SetActive(false); //Hide it until we select a tower
+
+        //Load Dummy tower prefab
+        GameObject dummyTowerobj = Library.instance.getPrefab(13); //We know the dummy tower is id 13, and this should not change
+        dummyTowerPrefab = dummyTowerobj.GetComponent<DummyTower>();
+        if (dummyTowerPrefab == null)
+            Debug.LogError("Unable to load Dummy tower prefab!");
 
         currentPlayerState = PlayerState.Idle;
         Time.fixedDeltaTime = 1f / (float)MapBase.simFramerate;
@@ -197,7 +204,7 @@ public class MapManager : MapBase {
             {
                 if (currentTile != null)
                 {
-                    Debug.Log("Left click on tile: " + currentTile + "(X:" + currentTile.tileX + " Y:"+ currentTile.tileY + ")");
+                    //Debug.Log("Left click on tile: " + currentTile + "(X:" + currentTile.tileX + " Y:"+ currentTile.tileY + ")");
                     if (currentPlayerState == PlayerState.PlacingTower)
                         gameManager.placeTower(currentTile, currentPlaceTower);
                 }
@@ -530,19 +537,23 @@ public class MapManager : MapBase {
             //TODO: Implement different selling mechanic, this feels too much like a hack, and can go wrong in so many ways later on
             //TODO: Check if player is allowed to sell this tower
             TowerBase toSell = tile.getMapObject() as TowerBase;
-            if (toSell != null)
+            if (toSell != null && toSell.canSell())
             {
                 collisionManager.removeTower(toSell.fixedCollider);
                 toSell.removeTower();
+                //TODO: Give money to player
+                gameManager.Money += (int)((int)toSell.getPrice() * toSell.sellValue());
             }
-            //TODO: Give money to player
+            else
+                return false;
+
             return true;
         }
 
         //Building
         //TODO: Check if player has the money/permission to build tower
         TowerBase newTower = null;
-        if (placeTower.canBuild(tile))
+        if (placeTower.canBuild(tile) && gameManager.Money >= placeTower.getPrice())
         {
             newTower = placeTower.createTower(tile, placeTower);
 
@@ -556,6 +567,7 @@ public class MapManager : MapBase {
             }
             else
             {
+                gameManager.Money -= placeTower.getPrice();
                 //Add tower to Collision Manager
                 collisionManager.addTower(newTower.fixedCollider);
                 return true;
@@ -576,7 +588,7 @@ public class MapManager : MapBase {
         if(tower is TowerSell)
         {
             TowerBase toSell = tile.getMapObject() as TowerBase;
-            if (toSell != null)
+            if (toSell != null && toSell.canSell())
             {
                 //TODO: Check if we are allowed to sell it
                 return true;
@@ -595,7 +607,15 @@ public class MapManager : MapBase {
             canPlace = false;
         newTower.removeTower();
 
-        //TODO: Place dummy tower
+        if(canPlace)
+        {
+            //Place dummy
+            Debug.Log("PLACE DUMMY");
+            dummyTowerPrefab.setOriginal(tower);
+            DummyTower dummy = dummyTowerPrefab.createTower(tile, dummyTowerPrefab, true) as DummyTower;
+            Debug.Log("CREATED DUMMY");
+        }
+        
         return canPlace;
     }
 
@@ -608,6 +628,7 @@ public class MapManager : MapBase {
             if (toSell != null)
             {
                 collisionManager.removeTower(toSell.fixedCollider);
+                gameManager.Money += (int)((int)toSell.getPrice() * toSell.sellValue());
                 toSell.removeTower();
             }
         }
@@ -615,6 +636,7 @@ public class MapManager : MapBase {
         {
             TowerBase newTower = tower.createTower(tile, tower);
             collisionManager.addTower(newTower.fixedCollider);
+            gameManager.Money -= (int)tower.getPrice();
         }
     }
 }

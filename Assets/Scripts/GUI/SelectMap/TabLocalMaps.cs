@@ -58,6 +58,7 @@ public class TabLocalMaps : SelectMapTab
             {
                 info = MapBase.readMapHeader(fileStream);
                 info.filename = file.Name;
+                fileStream.Close();
             }
             catch(Exception ex)
             {

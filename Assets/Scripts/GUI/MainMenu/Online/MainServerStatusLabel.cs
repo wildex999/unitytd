@@ -59,6 +59,10 @@ public class MainServerStatusLabel : MonoBehaviour {
                 label.text = "Connected";
                 label.color = colorOk;
                 break;
+            case MainServerState.LoggingIn:
+                label.text = "Logging in...";
+                label.color = colorOk;
+                break;
             case MainServerState.LoggedIn:
                 label.text = "Logged in! (" + net.getUsername() + ")";
                 label.color = colorOk;

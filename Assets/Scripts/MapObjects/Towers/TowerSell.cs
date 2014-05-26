@@ -17,7 +17,7 @@ public class TowerSell : TowerBase
         return "Temporary way to sell towers.\nTODO: Hit your nearest developer untill he develops\na proper sell function!";
     }
 
-    public override uint getPrice()
+    public override int getPrice()
     {
         return 0;
     }
@@ -62,7 +62,7 @@ public class TowerSell : TowerBase
         throw new System.NotImplementedException();
     }
 
-    public override float sellValue()
+    public override FInt sellValue()
     {
         throw new System.NotImplementedException();
     }
