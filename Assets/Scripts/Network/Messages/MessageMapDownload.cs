@@ -11,26 +11,26 @@ public class MessageMapDownload : Message
     public static MessageCommand thisCommand = MessageCommand.MapDownload;
     public static MessageEvent<MessageMapDownload> messageEvent = new MessageEvent<MessageMapDownload>();
 
-    private byte[] data;
+    private byte[] mapData;
 
     //New message Constructor
     public MessageMapDownload(byte[] mapData)
         : base(thisCommand, null)
     {
-        data = mapData;
+        this.mapData = mapData;
     }
 
     //Parse stream
     public MessageMapDownload(DataStream stream)
         : base(thisCommand, stream)
     {
-        data = stream.readBytes();
-        Debug.Log("Got map download of size: " + data.Length);
+        mapData = stream.readBytes();
+        Debug.Log("Got map download of size: " + mapData.Length);
     }
 
     public byte[] getMapData()
     {
-        return data;
+        return mapData;
     }
 
     //Register Message
@@ -56,7 +56,7 @@ public class MessageMapDownload : Message
         List<byte[]> byteList = new List<byte[]>();
 
         byteList.Add(BitConverter.GetBytes((ushort)command));
-        writeBytes(byteList, data);
+        writeBytes(byteList, mapData);
 
         return listToArray(byteList);
     }

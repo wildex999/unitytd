@@ -36,6 +36,8 @@ public class MapManager : MapBase {
     private MapTile goalTile = null;
     List<MapTile> spawns = new List<MapTile>();
 
+    public LinkedList<MapObject> objectList = new LinkedList<MapObject>(); //List of all map objects that are to be ticked
+
     private bool moveCamera = false; //Set to true when moving camera(Middle mouse button down)
     private bool inputOnGui; //Mouse over gui, ignore input
     private MapTile currentTile = null; //Current tile mouse is hovering over
@@ -210,6 +212,15 @@ public class MapManager : MapBase {
 
 	}
 
+    //Run StepUpdate on all Map objects
+    public void updateMapObjects()
+    {
+        for (LinkedListNode<MapObject> it = objectList.First; it != null; it = it.Next)
+        {
+            it.Value.StepUpdate();
+        }
+    }
+
     public override bool loadMap(BinaryReader stream)
     {
         //TestMap
@@ -318,7 +329,7 @@ public class MapManager : MapBase {
     }
 
     //Add object to map
-    public override MapObject addObject(MapObject obj, Vector2Gen<int> fixedPosition)
+    public override MapObject addObject(MapObject obj, FVector2 fixedPosition)
     {
         obj.transform.parent = this.transform;
         obj.transform.localPosition = Vector3.zero;
@@ -484,7 +495,9 @@ public class MapManager : MapBase {
                 continue;
 
             if (nextNode.cost == -1)
+            {
                 return true;
+            }
         }
 
         //TODO: Special spawns might not need a path for all types!
@@ -496,7 +509,9 @@ public class MapManager : MapBase {
             foreach (MapTile spawn in spawns)
             {
                 if (path.getNodeInfo(spawn).cost == -1)
+                {
                     return true;
+                }
             }
         }
 
@@ -527,7 +542,7 @@ public class MapManager : MapBase {
         //Building
         //TODO: Check if player has the money/permission to build tower
         TowerBase newTower = null;
-        if (placeTower.canBuild(currentTile))
+        if (placeTower.canBuild(tile))
         {
             newTower = placeTower.createTower(tile, placeTower);
 
@@ -555,7 +570,7 @@ public class MapManager : MapBase {
     {
         //Do local checks before asking the server
         //TODO: Do permission and money check
-        bool canPlace = false;
+        bool canPlace = true;
 
         //Selling
         if(tower is TowerSell)
@@ -581,13 +596,25 @@ public class MapManager : MapBase {
         newTower.removeTower();
 
         //TODO: Place dummy tower
-
         return canPlace;
     }
 
     //Server actions(Done by server, so do here too)
     public void serverPlaceTower(MapTile tile, TowerBase tower, Player player)
     {
-        tower.createTower(tile, tower);
+        if (tower is TowerSell)
+        {
+            TowerBase toSell = tile.getMapObject() as TowerBase;
+            if (toSell != null)
+            {
+                collisionManager.removeTower(toSell.fixedCollider);
+                toSell.removeTower();
+            }
+        }
+        else
+        {
+            TowerBase newTower = tower.createTower(tile, tower);
+            collisionManager.addTower(newTower.fixedCollider);
+        }
     }
 }

@@ -78,4 +78,9 @@ public class Player
         }
         return localPlayer;
     }
+
+    public override string ToString()
+    {
+        return "Player - Id: " + id + " Name: " + name;
+    }
 }

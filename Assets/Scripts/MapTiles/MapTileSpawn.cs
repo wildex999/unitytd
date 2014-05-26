@@ -1,61 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MapTileSpawn : MapTile {
+//This tile will create a MobSpawn on top of itself
 
-    public float timeBetweenSpawns;
-    public float timeToFirstFlyer;
-    public float timeBetweenFlyers;
-
-    private float lastUnitTime;
-    private float lastFlyerTime;
-    private GameObject Mob1 = null;
-    private GameObject Mob2 = null;
-    private CollisionManager collisionManager;
-
+public class MapTileSpawn : MapTile
+{
     public override void init(MapManager map, int x, int y)
     {
         base.init(map, x, y);
-        if(map != null)
-            map.addSpawn(this);
-    }
 
-    void Start()
-    {
-        if(Mob1 == null)
-        {
-            Mob1 = Resources.Load<GameObject>("Mobs/Mob1");
-            Mob2 = Resources.Load<GameObject>("Mobs/Mob2_Flying");
-        }
-
-        //Start timer for waves
-        //TODO
-    }
-
-    void Update()
-    {
-        if (!MapManager.gameRunning)
-            return;
-
-        Vector2Gen<int> fixedPos = new Vector2Gen<int>((int)transform.localPosition.x * 200, (int)transform.localPosition.y * 200);
-        lastUnitTime -= Time.deltaTime;
-        if (lastUnitTime <= 0f)
-        {
-            lastUnitTime += timeBetweenSpawns;
-            MapObject mob = map.addObject(MapManager.createObject(Mob1), fixedPos);
-        }
-        if(timeToFirstFlyer > 0f)
-            timeToFirstFlyer-= Time.deltaTime;
-        else
-        {
-            lastFlyerTime -= Time.deltaTime;
-            if(lastFlyerTime <= 0f)
-            {
-                lastFlyerTime += timeBetweenFlyers;
-                MapObject mob = map.addObject(MapManager.createObject(Mob2), fixedPos);
-            }
-        }
-        //Spawn waves
-        //TODO
+        //Create MobSpawner
+        GameObject obj = new GameObject();
+        MobSpawn spawn = obj.AddComponent<MobSpawn>();
+        map.addObject(spawn, new FVector2(x*(int)MapBase.unitSizeFixed, y*(int)MapBase.unitSizeFixed));
     }
 }

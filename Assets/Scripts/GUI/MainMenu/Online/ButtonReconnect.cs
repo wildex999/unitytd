@@ -22,11 +22,11 @@ public class ButtonReconnect : MonoBehaviour
         if (manager == null)
             return;
 
-        if (manager.mainState == MainServerState.Connecting || manager.mainState == MainServerState.Connected)
+        if (manager.mainState == MainServerState.Connecting || manager.mainState == MainServerState.Connected || manager.isLoggedIn())
         {
             if (prevState == false)
                 return;
-            Debug.Log("DISABLING " + renderers.Length);
+
             collider.enabled = false;
             foreach (UIWidget renderer in renderers)
                 renderer.enabled = false;
@@ -36,7 +36,7 @@ public class ButtonReconnect : MonoBehaviour
         {
             if (prevState == true)
                 return;
-            Debug.Log("Enabling");
+
             collider.enabled = true;
             foreach (UIWidget renderer in renderers)
                 renderer.enabled = true;

@@ -57,4 +57,18 @@ public class TowerItem : MonoBehaviour
 
         map.startPlacingTower(tower);
     }
+    void OnTooltip(bool show)
+    {
+        if (show)
+        {
+            string tooltip = "";
+            tooltip += "[00FFFF]" + tower.getName() + "[-]\n\n";
+            tooltip += "[AFAFAF]Description:[-]\n" + tower.getDescription() + "\n\n";
+            tooltip += "[AFAFAF]Price:[-] [00FF00]" + tower.getPrice() + "[-]";
+            UITooltip.ShowText(tooltip);
+        }
+        else
+            UITooltip.ShowText(null);
+    }
+
 }

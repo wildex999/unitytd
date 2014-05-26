@@ -21,4 +21,9 @@ public class Vector2Gen<T>
     {
         get { return _y; }
     }
+
+    public override string ToString()
+    {
+        return "Vector2Gen: " + _x + " | " + _y;
+    }
 }

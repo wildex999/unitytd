@@ -52,12 +52,6 @@ public class CollisionManager : MonoBehaviour
             units.Remove(collider.listNode);
     }
 
-    void OnTriggerStay2D(Collider2D other)
-    {
-        //Run collision check after fixedUpdate, but before normal update and animations
-        doCollisionCheck();
-    }
-
     //Do collision check for all objects
     public void doCollisionCheck()
     {

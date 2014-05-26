@@ -57,6 +57,12 @@ public class EditorMap : MapBase {
 	
 	// Update is called once per frame
 	void Update () {
+        //List for exit(TODO: Replace with a proper menu)
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.LoadLevel(0);
+        }
+
         //Check if we are to check input
         Camera nguiCam = guiCamera.camera;
         Ray inputRay = nguiCam.ScreenPointToRay(Input.mousePosition);
@@ -224,7 +230,7 @@ public class EditorMap : MapBase {
         return tile;
     }
 
-    public override MapObject addObject(MapObject obj, Vector2Gen<int> fixedPosition)
+    public override MapObject addObject(MapObject obj, FVector2 fixedPosition)
     {
         throw new System.NotImplementedException();
     }
@@ -255,11 +261,6 @@ public class EditorMap : MapBase {
         return mapInfo.filename;
     }
 
-    public MapInfo getMapInfo()
-    {
-        return mapInfo;
-    }
-
     //Start a new map
     public void newMap()
     {
@@ -287,6 +288,8 @@ public class EditorMap : MapBase {
 
         BinaryReader reader = new BinaryReader(mapFile);
         loadMap(reader);
+
+        mapFile.Close();
 
         Debug.Log("Loaded map!");
     }

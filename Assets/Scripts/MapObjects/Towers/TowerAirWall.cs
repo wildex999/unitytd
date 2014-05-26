@@ -18,17 +18,17 @@ public class TowerAirWall : TowerBase
 
     public override string getName()
     {
-        throw new System.NotImplementedException();
+        return displayName;
     }
 
     public override string getDescription()
     {
-        throw new System.NotImplementedException();
+        return "This tower is weird...\nIn production since they day we lost gravity!";
     }
 
     public override uint getPrice()
     {
-        throw new System.NotImplementedException();
+        return 5;
     }
 
     public override UnityEngine.Sprite getMenuSprite()

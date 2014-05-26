@@ -39,9 +39,9 @@ public class QuadTreeNode<T> : ICollideHandler
         }
     }
 
-    public Vector2Gen<int> getFixedPosition()
+    public FVector2 getFixedPosition(bool local = false)
     {
-        return new Vector2Gen<int>(posX, posY);
+        return new FVector2(posX, posY);
     }
 
     public override string ToString()

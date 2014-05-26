@@ -28,7 +28,7 @@ public class MapTile : MonoBehaviour, IPathNode, IFixedPosition, ISerializedObje
     public int prefabId;
 
     private ITileObject mapObj; //The map object placed on this tile(I.e a tower)
-    private Vector2Gen<int> fixedPosition;
+    private FVector2 fixedPosition;
 
     public virtual void init(MapManager map, int x, int y)
     {
@@ -36,7 +36,7 @@ public class MapTile : MonoBehaviour, IPathNode, IFixedPosition, ISerializedObje
         tileX = x;
         tileY = y;
         //TODO: update this as TileX or TileY is changed.
-        fixedPosition = new Vector2Gen<int>(tileX * (int)MapBase.unitSizeFixed, tileY * (int)MapBase.unitSizeFixed);
+        fixedPosition = new FVector2(tileX * (int)MapBase.unitSizeFixed, tileY * (int)MapBase.unitSizeFixed);
     }
 
     public ITileObject getMapObject()
@@ -87,7 +87,7 @@ public class MapTile : MonoBehaviour, IPathNode, IFixedPosition, ISerializedObje
         return this.GetInstanceID();
     }
 
-    public void setPosition(Vector2Gen<int> position)
+    public void setPosition(FVector2 position)
     {
         throw new System.NotImplementedException();
     }
@@ -97,7 +97,7 @@ public class MapTile : MonoBehaviour, IPathNode, IFixedPosition, ISerializedObje
         throw new System.NotImplementedException();
     }
 
-    public Vector2Gen<int> getFixedPosition()
+    public FVector2 getFixedPosition(bool local = false)
     {
         //TODO: Get offset to parent if set
         return fixedPosition;

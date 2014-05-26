@@ -14,10 +14,10 @@ public class FixedCircleCollider : FixedCollider
     {
         //Get distance between centers, and test if larger than their added radiuses.
         //(x2 - x1)^2 + (y2 - y1)^2 <= (r1^2 + r2^2) 
-        Vector2Gen<int> otherPos = other.handler.getFixedPosition();
-        Vector2Gen<int> pos = handler.getFixedPosition();
-        int xDiff = (otherPos.x - pos.x) * (otherPos.x - pos.x);
-        int yDiff = (otherPos.y - pos.y) * (otherPos.y - pos.y);
+        FVector2 otherPos = other.handler.getFixedPosition();
+        FVector2 pos = handler.getFixedPosition();
+        int xDiff = (int)((otherPos.x - pos.x) * (otherPos.x - pos.x));
+        int yDiff = (int)((otherPos.y - pos.y) * (otherPos.y - pos.y));
 
         if (xDiff + yDiff < (other.radius * other.radius) + (radius * radius))
             return true;

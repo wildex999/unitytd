@@ -9,17 +9,17 @@ public class TowerSell : TowerBase
 
     public override string getName()
     {
-        throw new System.NotImplementedException();
+        return displayName;
     }
 
     public override string getDescription()
     {
-        throw new System.NotImplementedException();
+        return "Temporary way to sell towers.\nTODO: Hit your nearest developer untill he develops\na proper sell function!";
     }
 
     public override uint getPrice()
     {
-        throw new System.NotImplementedException();
+        return 0;
     }
 
     public override UnityEngine.Sprite getMenuSprite()

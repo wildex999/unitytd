@@ -99,8 +99,11 @@ public class MapSelector : MonoBehaviour
                 //In case the user wrote in a filename directly, we have to try to read it
                 try
                 {
+#if !UNITY_WEBPLAYER
                     FileStream fileInput = file.Open(FileMode.Open);
                     item = MapBase.readMapHeader(fileInput);
+#endif
+                    
                 }
                 catch(Exception ex)
                 {

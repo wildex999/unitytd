@@ -4,7 +4,7 @@ using UnityEngine;
 //Fixed point collision handler
 public interface ICollideHandler
 {
-    Vector2Gen<int> getFixedPosition();
+    FVector2 getFixedPosition(bool local = false);
     GameObject getGameObject();
     bool isValid(); //whether this handler is still valid. Used by remembered collisions
 

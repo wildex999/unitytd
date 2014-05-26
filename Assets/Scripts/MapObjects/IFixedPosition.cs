@@ -3,10 +3,10 @@
 using UnityEngine;
 public interface IFixedPosition
 {
-    void setPosition(Vector2Gen<int> position);
+    void setPosition(FVector2 position);
     void setParent(IFixedPosition parent);
 
-    Vector2Gen<int> getFixedPosition();
+    FVector2 getFixedPosition(bool local = false);
     GameObject getGameObject();
     IFixedPosition getParent();
 }

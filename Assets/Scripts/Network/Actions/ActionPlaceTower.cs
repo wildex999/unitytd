@@ -21,6 +21,56 @@ public class ActionPlaceTower : Action
     public ActionPlaceTower(BinaryReader stream, Actions action, Player player, GameManager game, out bool valid)
         : base(action, player, game)
     {
+        //Permission check
+        if(!game.isAuthorative)
+        {
+            if(player != game.gameHost) //Only host is allowed to send this to players
+            {
+                valid = false;
+                return;
+            }
+        }
+
+        //Read the stream
+        //Tile
+        int tileX = stream.ReadInt32();
+        int tileY = stream.ReadInt32();
+        tile = game.getMap().getTile(tileX, tileY);
+        if(tile == null)
+        {
+            Debug.LogError("Could not get tile for " + tileX + " | " + tileY);
+            valid = false;
+            return;
+        }
+
+        //Player
+        int placingPlayerId = stream.ReadInt32();
+        placingPlayer = game.getPlayer(placingPlayerId);
+        if(placingPlayer == null)
+        {
+            Debug.LogError("Could not get player: " + placingPlayerId);
+            valid = false;
+            return;
+        }
+
+        //Tower
+        int prefabId = stream.ReadInt32();
+        GameObject prefab = Library.instance.getPrefab(prefabId);
+        if(prefab == null)
+        {
+            Debug.LogError("Could not get prefab: " + prefabId);
+            valid = false;
+            return;
+        }
+
+        tower = prefab.GetComponent<TowerBase>();
+        if(tower == null)
+        {
+            Debug.LogError("Could not get TowerBase from prefab: " + prefab);
+            valid = false;
+            return;
+        }
+
         valid = true;
     }
 
@@ -28,12 +78,17 @@ public class ActionPlaceTower : Action
     {
         MapManager map = game.getMap();
 
+        Debug.Log("TOWER PLACE ON STEP: " + game.getCurrentFixedStep());
+        Monster lastMonster = Monster.monsters.Last.Value;
+        Debug.Log("Monster count: " + Monster.monsters.Count + " Last Monster: " + lastMonster + " X: " + lastMonster.getFixedPosition().x + " Y: " + lastMonster.getFixedPosition().y);
+
         //If we are server
         if(game.isAuthorative) 
         {
             if (map.authorativePlaceTower(tile, tower, placingPlayer))
             {
                 //Broadcast to players
+                game.outgoingActions.Add(new ActionPlaceTower(game, tile, tower, placingPlayer)); //Can we just reuse the current action(this)?
             }
             else
             {
@@ -59,10 +114,19 @@ public class ActionPlaceTower : Action
     //Serialized format:
     //tileX (int)
     //tileY (int)
-    //prefab id(int) - Tower prefab
     //userid(int) - Original placing player
-    public override byte[] writeAction(System.IO.BinaryWriter stream)
+    //prefab id(int) - Tower prefab
+    //Tower data?(byte[])
+    public override byte[] getBytes()
     {
-        throw new System.NotImplementedException();
+        MemoryStream memory = new MemoryStream(16);
+        BinaryWriter stream = new BinaryWriter(memory);
+
+        stream.Write(tile.tileX);
+        stream.Write(tile.tileY);
+        stream.Write(player.getId());
+        stream.Write(tower.prefabId);
+        //stream.Write(tower.getBytes());
+        return memory.GetBuffer();
     }
 }

@@ -206,11 +206,11 @@ public abstract class MapBase : MonoBehaviour
     public abstract MapTile setTile(int x, int y, MapTile tile);
     public abstract MapTile getTile(int x, int y);
 
-    public abstract MapObject addObject(MapObject obj, Vector2Gen<int> fixedPositon);
+    public abstract MapObject addObject(MapObject obj, FVector2 fixedPositon);
     public abstract void removeObject(MapObject obj);
 
     //Create a new instance of objecty given by resource string and add it to the map
-    public MapObject createObject(string resource, Vector2Gen<int> fixedPosition)
+    public MapObject createObject(string resource, FVector2 fixedPosition)
     {
         GameObject obj = loadGameObject(resource);
         if (obj == null)
@@ -235,9 +235,9 @@ public abstract class MapBase : MonoBehaviour
         return getTile(tileX, tileY);
     }
 
-    public MapTile getTileWorld(Vector2Gen<int> pos)
+    public MapTile getTileWorld(FVector2 pos)
     {
-        return getTileWorld(pos.x, pos.y);
+        return getTileWorld((int)pos.x, (int)pos.y);
     }
 
     public MapTile getTileWorld(int x, int y)

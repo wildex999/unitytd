@@ -7,6 +7,7 @@ public class GUIPrefabs : MonoBehaviour {
     public GameObject MapSelector;
     public GameObject MessageBox;
     public GameObject PreGamePanel;
+    public GameObject gameChat;
 
     public GUIPrefabs()
     {

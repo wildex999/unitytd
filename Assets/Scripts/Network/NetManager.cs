@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
@@ -94,8 +95,10 @@ public class ReceiveState
 public class NetManager : MonoBehaviour
 {
     private static NetManager instance;
+    private GameManager game;
 
-    public static string mainIp = "127.0.0.1";
+    //public static string mainIp = "127.0.0.1";
+    public static string mainIp = "95.85.53.18";
     public static int mainPort = 12000;
 
     public Socket mainSocket;
@@ -213,8 +216,8 @@ public class NetManager : MonoBehaviour
         if (mainSocket == null || !mainSocket.Connected)
             return;
 
-        if (type == LogType.Warning)
-            return;
+        /*if (type == LogType.Warning)
+            return;*/
 
         MessageLog logMessage;
         switch(type)
@@ -269,6 +272,18 @@ public class NetManager : MonoBehaviour
     {
         //Check for new messages
         handleNewMessages();
+    }
+
+    public GameManager getGame()
+    {
+        if (game == null)
+            Debug.LogError("Assert: Tried to get game from net, but it was null at this point!");
+        return game;
+    }
+
+    public void setGame(GameManager game)
+    {
+        this.game = game;
     }
 
     public bool connectToMainServer(string ip, int port)
@@ -328,6 +343,8 @@ public class NetManager : MonoBehaviour
             return;
         }
 
+        mainSocket.NoDelay = true;
+
         mainState = MainServerState.Connected;
         Debug.Log("Connected to server: " + mainSocket.RemoteEndPoint.ToString());
 
@@ -337,10 +354,14 @@ public class NetManager : MonoBehaviour
     }
 
     //Try to send message from sending queue
+    //TODO: Move onto another thread so it doesn't just send one message per update, or start next send inside handler of previous(Worker thread)
     private void handleSendingMessage()
     {
         if (!canSend())
+        {
+            messageSendQueue.clear(); //We don't allow queuing messages when not in a state to send
             return; //TODO: Add to network error queue
+        }
 
         if(sendMessageLock.WaitOne(0))
         {
@@ -348,9 +369,16 @@ public class NetManager : MonoBehaviour
 
             if (message != null)
             {
-                Debug.LogWarning("Handle send Message: " + message.getCommand());
+                //Debug.LogWarning("Handle send Message: " + message.getCommand());
 
                 byte[] messageData = message.getBytes();
+
+                if(messageData.Length > ushort.MaxValue-1)
+                {
+                    //Split?
+                    Debug.LogError("Message too large: " + messageData.Length);
+                    return;
+                }
 
                 //Add message length to the front
                 byte[] messageLength = BitConverter.GetBytes((ushort)(messageData.Length));
@@ -363,7 +391,7 @@ public class NetManager : MonoBehaviour
 
                 MessageSendData customData = new MessageSendData(message.socket, sendData);
 
-                Debug.LogWarning("Sending " + sendData.Length + " bytes(C: " + message.getCommand() + ")");
+                //Debug.LogWarning("Sending " + sendData.Length + " bytes(C: " + message.getCommand() + ")");
                 message.socket.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, new AsyncCallback(callbackSendMessage), customData);
             }
         }
@@ -373,7 +401,7 @@ public class NetManager : MonoBehaviour
     //Check if connection to main server is in a state to allow sending messages
     private bool canSend()
     {
-        if(mainState == MainServerState.Connecting || mainState == MainServerState.ConnectionFailed || mainState == MainServerState.Disconnected
+        if (mainState == MainServerState.Connecting || mainState == MainServerState.ConnectionFailed || mainState == MainServerState.Disconnected
             || mainState == MainServerState.NotConnected)
             return false;
 
@@ -431,7 +459,7 @@ public class NetManager : MonoBehaviour
         try
         {
             int bytesReceived = state.socket.EndReceive(ar);
-            Debug.Log("Received bytes: " + bytesReceived);
+            //Debug.Log("Received bytes: " + bytesReceived);
             if(bytesReceived > 0)
             {
                 //Create new receiveBuffer, copy remaining old data, copy new buffer data,
@@ -557,7 +585,7 @@ public class NetManager : MonoBehaviour
 
     public bool sendMessage(Socket target, Message message, bool sendNow = true)
     {
-        Debug.LogWarning("sendMessage1");
+        //Debug.LogWarning("sendMessage1");
         if (!canSend())
             return false;
 
@@ -567,7 +595,7 @@ public class NetManager : MonoBehaviour
         message.socket = target;
         messageSendQueue.push(message);
 
-        Debug.LogWarning("SendMessage, Queue: " + messageSendQueue.count());
+        //Debug.LogWarning("SendMessage, Queue: " + messageSendQueue.count());
 
         if (sendNow)
             handleSendingMessage(); //Try to send it now
@@ -575,28 +603,52 @@ public class NetManager : MonoBehaviour
         return true;
     }
 
+    //Send an action to a player
+    public bool sendAction(Action action, Player player)
+    {
+        MessageAction actionMessage = new MessageAction(action);
+        MessageSendMessage message = new MessageSendMessage(player, actionMessage);
+        return sendMessage(mainSocket, message);
+    }
+
+    //Send an action to all players
+    public bool broadcastAction(Action action)
+    {
+        MessageAction actionMessage = new MessageAction(action);
+        MessageBroadcast broadcast = new MessageBroadcast(actionMessage, false);
+        return sendMessage(mainSocket, broadcast);
+    }
+
     public void callbackSendMessage(IAsyncResult ar)
     {
         MessageSendData data = (MessageSendData)ar.AsyncState;
         Socket client = data.socket;
 
+        //Debug.LogWarning("Start send message");
+
         if (!client.Connected)
+        {
+            Debug.LogWarning("Aborted send due to client not connected.");
             return;
+        }
 
         int bytesSent = 0;
         try
         {
             bytesSent = client.EndSend(ar);
+            //Debug.LogWarning("Send complete: " + bytesSent);
         }
         catch(SocketException ex)
         {
             networkErrorQueue.push(new NetworkError(client, DisconnectCause.UnknownError, ex.Message));
+            Debug.LogWarning("Send error: " + ex.Message);
             return;
         }
         catch(ObjectDisposedException)
         {
             //Connection has been closed
             networkErrorQueue.push(new NetworkError(client, DisconnectCause.LostConnection));
+            Debug.LogWarning("Send error: Lost connection");
             return;
         }
 
@@ -607,7 +659,7 @@ public class NetManager : MonoBehaviour
             byte[] remaining = new byte[remainingLength];
             Array.Copy(data.data, bytesSent, remaining, 0, remainingLength);
             data.data = remaining;
-            //Debug.Log("Continue to send remaining: " + remainingLength);
+            Debug.LogWarning("Continue to send remaining: " + remainingLength);
             client.BeginSend(remaining, 0, remaining.Length, SocketFlags.None, new AsyncCallback(callbackSendMessage), data);
         }
         else
@@ -675,7 +727,7 @@ public class NetManager : MonoBehaviour
     }
 
     //Close connection with closing message
-    private void closeConnection(Socket socket, DisconnectCause cause, string message = "No reason")
+    public void closeConnection(Socket socket, DisconnectCause cause, string message = "No reason")
     {
         if(cause == DisconnectCause.LostConnection)
             message = "Lost connection to server!";
@@ -690,6 +742,8 @@ public class NetManager : MonoBehaviour
     //Handle main server disconnects
     private void onDisconnect(Socket socket, DisconnectCause cause, string message)
     {
+        loggedIn = false;
+
         MessageBox.createMessageBox("Network Error", message);
 
         Debug.Log("Cause: " + cause);

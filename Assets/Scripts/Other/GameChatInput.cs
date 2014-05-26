@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 //Based on NGUI ChatInput
 
@@ -10,6 +11,10 @@ public class GameChatInput : MonoBehaviour
 
     public delegate void ChatEventHandler(string message);
     public static event ChatEventHandler ChatEvent;
+
+    public List<string> chatHistory; //The input chat history
+    public int currentHistoryIndex;
+    public string currentChatInput;
 
     void Start()
     {

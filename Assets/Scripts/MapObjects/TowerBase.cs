@@ -37,9 +37,14 @@ public abstract class TowerBase : Building, ITileObject, ICollideHandler
         tileGroup = new TileGroup(this);
     }
 
-    void Awake()
+    public override void OnCreate()
     {
         updateCollider();
+    }
+
+    public override void OnRemove()
+    {
+
     }
 
     protected virtual void updateCollider()
@@ -62,7 +67,7 @@ public abstract class TowerBase : Building, ITileObject, ICollideHandler
 
     //Projectile
     //Create a new(copy) projectile from base
-    public Projectile createProjectile(GameObject baseObj)
+    public Projectile createProjectile(GameObject baseObj, FVector2 fixedPosition)
     {
         //TODO: Object pool
         if (baseObj == null)
@@ -84,6 +89,8 @@ public abstract class TowerBase : Building, ITileObject, ICollideHandler
             Debug.LogError("Failed to get Projectile script from object: " + obj);
             return null;
         }
+
+        map.addObject(proj, fixedPosition);
 
         return proj;
     }

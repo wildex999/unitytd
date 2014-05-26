@@ -18,11 +18,11 @@ public class FixedBoxCollider : FixedCollider
     {
         //Get closest point to circle center, clamped by box size, 
         //and check if the distance between that point and circle center is less than circle radius
-        Vector2Gen<int> otherPos = other.handler.getFixedPosition();
-        Vector2Gen<int> pos = handler.getFixedPosition();
+        FVector2 otherPos = other.handler.getFixedPosition();
+        FVector2 pos = handler.getFixedPosition();
 
-        int xDistance = otherPos.x - pos.x;
-        int yDistance = otherPos.y - pos.y;
+        int xDistance = (int)(otherPos.x - pos.x);
+        int yDistance = (int)(otherPos.y - pos.y);
 
         if(xDistance * xDistance > width * width) //Test absolute value
         {
@@ -40,12 +40,12 @@ public class FixedBoxCollider : FixedCollider
                 yDistance = height;
         }
 
-        int pointX = pos.x + xDistance;
-        int pointY = pos.y + yDistance;
+        int pointX = (int)(pos.x + xDistance);
+        int pointY = (int)(pos.y + yDistance);
 
         //Test if point is inside circle
-        xDistance = pointX - otherPos.x;
-        yDistance = pointY - otherPos.y;
+        xDistance = (int)(pointX - otherPos.x);
+        yDistance = (int)(pointY - otherPos.y);
 
         if ((xDistance * xDistance) + (yDistance * yDistance) <= other.radius * other.radius)
             return true;

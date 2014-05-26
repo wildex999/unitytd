@@ -29,6 +29,7 @@ public class ButtonCreateGame : MonoBehaviour
 
         //Ask user to choose map
         MapSelector selector = MapSelector.createMapSelector(transform.parent.gameObject, MapSelectorType.Open);
+        selector.transform.localPosition = new Vector3(20, 0, 0);
         selector.SelectMapEvent += onMapSelected;
     }
 

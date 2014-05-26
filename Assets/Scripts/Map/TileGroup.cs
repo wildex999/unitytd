@@ -70,7 +70,7 @@ public class TileGroup
             int halfUnit = (int)MapBase.unitSizeFixed / 2;
             int offset = (size * halfUnit) - halfUnit;
 
-            obj.init(baseTile.map, new Vector2Gen<int>(offset, offset), baseTile);
+            obj.init(baseTile.map, new FVector2(offset, offset), baseTile);
         }
     }
 

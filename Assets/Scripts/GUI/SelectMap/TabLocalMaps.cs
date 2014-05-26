@@ -32,6 +32,7 @@ public class TabLocalMaps : SelectMapTab
     //Get Maps from local storage and fill the list
     void fillMapsList()
     {
+#if !UNITY_WEBPLAYER
         DirectoryInfo dir = getDirectory(mapPath, true);
         FileInfo[] files = dir.GetFiles("*.utdmap");
 
@@ -87,6 +88,26 @@ public class TabLocalMaps : SelectMapTab
             mapItem.mapMeta.text = cOwner + info.ownerName + " ||" + cVersion + info.version + " ||" + cRecommendedPlayers + info.recommendedPlayers + " ||" + cSize + info.sizeX + " x " + info.sizeY;
             mapItem.mapInfo = info;
         }
+#elif UNITY_WEBPLAYER
+        GameObject item = NGUITools.AddChild(itemsList, baseMapItemPrefab);
+        item.transform.localPosition = new Vector3(item.transform.localPosition.x, item.transform.localPosition.y, -1); //NGUI is a bit picky, we have to move these towards the camera(Z sorting disabled my a**)
+        UIDragPanelContents content = item.GetComponent<UIDragPanelContents>();
+        content.draggablePanel = itemsPanel;
+
+        UIButtonMessage message = item.GetComponent<UIButtonMessage>();
+        message.target = selector.gameObject;
+
+        MapItem mapItem = item.GetComponent<MapItem>();
+        if (mapItem == null)
+        {
+            Debug.LogError("Could not get MapItem while creating list!");
+            return;
+        }
+
+        itemsList.GetComponent<UIGrid>().Reposition();
+
+        mapItem.mapName.text = "No map files can be read/written in the web player!";
+#endif
     }
 
 

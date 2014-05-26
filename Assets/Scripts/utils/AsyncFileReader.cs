@@ -72,8 +72,13 @@ public class AsyncFileReader
 
         try
         {
+#if !UNITY_WEBPLAYER
             fileData = File.ReadAllBytes(filename);
             setReadStatus(ReadStatus.Complete);
+#elif UNITY_WEBPLAYER
+            error = new Exception("Not possible to read files in Web player!");
+            setReadStatus(ReadStatus.Error);
+#endif
         }
         catch(Exception ex)
         {

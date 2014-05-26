@@ -1,359 +1,368 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.20506</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CEBCFDEE-58FC-39DB-8605-24B760968271}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>
-    </RootNamespace>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <BaseDirectory>Assets</BaseDirectory>
+	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+	<ProductVersion>10.0.20506</ProductVersion>
+	<SchemaVersion>2.0</SchemaVersion>
+	<ProjectGuid>{CEBCFDEE-58FC-39DB-8605-24B760968271}</ProjectGuid>
+	<OutputType>Library</OutputType>
+	<AppDesignerFolder>Properties</AppDesignerFolder>
+	<RootNamespace></RootNamespace>
+	<AssemblyName>Assembly-CSharp</AssemblyName>
+	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+	<FileAlignment>512</FileAlignment>
+	<BaseDirectory>Assets</BaseDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>Temp\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;UNITY_STANDALONE_WIN;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>0169</NoWarn>
+	<DebugSymbols>true</DebugSymbols>
+	<DebugType>full</DebugType>
+	<Optimize>false</Optimize>
+	<OutputPath>Temp\bin\Debug\</OutputPath>
+	<DefineConstants>DEBUG;TRACE;UNITY_WEBPLAYER;WEBPLUG;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>Temp\bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>0169</NoWarn>
+	<DebugType>pdbonly</DebugType>
+	<Optimize>true</Optimize>
+	<OutputPath>Temp\bin\Release\</OutputPath>
+	<DefineConstants>TRACE</DefineConstants>
+	<ErrorReport>prompt</ErrorReport>
+	<WarningLevel>4</WarningLevel>
+	<NoWarn>0169</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
+	<Reference Include="System" />
     <Reference Include="System.XML" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="UnityEngine">
-      <HintPath>N:/Development/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>N:/Development/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
-    </Reference>
+	<Reference Include="System.Core" />
+	<Reference Include="System.Xml.Linq" />
+	<Reference Include="UnityEngine">
+	  <HintPath>N:/Development/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	</Reference>
+	<Reference Include="UnityEditor">
+	  <HintPath>N:/Development/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	</Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\GameAnalytics\Plugins\Components\GA_Tracker.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\ComboBox.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleBall.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleController.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleFloor.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleHighScore.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleManager.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleMoveWithPlayer.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleTarget.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleWall.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_AdSupport.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Archive.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Business.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_ContinuationManager.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_CustomAdTrigger.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_DataPoint.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Debug.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Design.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Error.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_FacebookSDK.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_GUIHelper.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_GameObjectManager.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_GenericInfo.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Gui.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_HeatMapDataFilter.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_HeatMapDataFilterBase.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_HeatMapRenderer.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_HeatmapData.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Histogram.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_MiniJson.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Quality.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Queue.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Request.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_ServerFieldTypes.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Settings.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_SpecialEvents.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Submit.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_SystemTracker.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Tracking.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_User.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\MD5.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\MD5Wrapper.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendBusinessEvent.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendDesignEvent.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendQualityEvent.cs" />
-    <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendUserEvent.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipItems.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipRandomItem.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UICursor.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UIEquipmentSlot.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UIItemSlot.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UIItemStorage.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UIStorageSlot.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvAttachmentPoint.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvBaseItem.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvDatabase.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvEquipment.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvGameItem.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvStat.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\ChatInput.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\DownloadTexture.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\DragDropContainer.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\DragDropItem.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\DragDropRoot.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\DragDropSurface.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\LagPosition.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\LagRotation.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\LoadLevelOnClick.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\LookAtTarget.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\PanWithMouse.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\PlayIdleAnimations.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\SetColorOnSelection.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\ShaderQuality.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\Spin.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\SpinWithMouse.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\TypewriterEffect.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\UpdateManager.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\WindowAutoYaw.cs" />
-    <Compile Include="Assets\NGUI\Examples\Scripts\Other\WindowDragTilt.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\LanguageSelection.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButton.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonActivate.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonColor.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonKeyBinding.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonKeys.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonMessage.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonOffset.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonPlayAnimation.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonRotation.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonScale.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonSound.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonTween.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UICenterOnChild.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UICheckbox.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UICheckboxControlledComponent.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UICheckboxControlledObject.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIDragCamera.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIDragObject.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIDragPanelContents.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIDraggableCamera.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIDraggablePanel.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIForwardEvents.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIGrid.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIImageButton.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIInputValidator.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIPopupList.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UISavedOption.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UIScrollBar.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UISlider.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UISliderColors.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UISoundVolume.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Interaction\UITable.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\ActiveAnimation.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\AnimationOrTween.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\BMFont.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\BMGlyph.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\BMSymbol.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\BetterList.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\ByteReader.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\IgnoreTimeScale.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\Localization.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\NGUIDebug.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\NGUIMath.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\NGUITools.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\SpringPanel.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\UIDrawCall.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\UIEventListener.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\UIGeometry.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\UINode.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Internal\UIWidget.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\AnimatedAlpha.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\AnimatedColor.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\SpringPosition.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\TweenAlpha.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\TweenColor.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\TweenFOV.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\TweenOrthoSize.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\TweenPosition.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\TweenRotation.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\TweenScale.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\TweenTransform.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\TweenVolume.cs" />
-    <Compile Include="Assets\NGUI\Scripts\Tweening\UITweener.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIAnchor.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIAtlas.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UICamera.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIFilledSprite.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIFont.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIInput.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIInputSaved.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UILabel.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UILocalize.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIOrthoCamera.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIPanel.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIRoot.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UISlicedSprite.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UISprite.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UISpriteAnimation.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIStretch.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UITextList.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UITexture.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UITiledSprite.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
-    <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
-    <Compile Include="Assets\Scripts\Collision\CollisionManager.cs" />
-    <Compile Include="Assets\Scripts\Collision\FixedBoxCollider.cs" />
-    <Compile Include="Assets\Scripts\Collision\FixedCircleCollider.cs" />
-    <Compile Include="Assets\Scripts\Collision\FixedCollider.cs" />
-    <Compile Include="Assets\Scripts\Collision\ICollideHandler.cs" />
-    <Compile Include="Assets\Scripts\Collision\QuadTree\QuadTree.cs" />
-    <Compile Include="Assets\Scripts\Collision\QuadTree\QuadTreeNode.cs" />
-    <Compile Include="Assets\Scripts\GUI\ButtonDestroyObject.cs" />
-    <Compile Include="Assets\Scripts\GUI\GUIPrefabs.cs" />
-    <Compile Include="Assets\Scripts\GUI\Game\PreGamePanel.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonMapEditor.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonOnline.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonPlayTestMap.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonCreateGame.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonGetGameInfo.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonJoinGame.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonMultiplayer.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonReconnect.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\Online\GameInfoLabel.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\Online\MainServerStatusLabel.cs" />
-    <Compile Include="Assets\Scripts\GUI\MainMenu\Online\OnlinePanel.cs" />
-    <Compile Include="Assets\Scripts\GUI\MapEditor\ButtonLoad.cs" />
-    <Compile Include="Assets\Scripts\GUI\MapEditor\ButtonSave.cs" />
-    <Compile Include="Assets\Scripts\GUI\MapEditor\GraphicItem.cs" />
-    <Compile Include="Assets\Scripts\GUI\MapEditor\TileItem.cs" />
-    <Compile Include="Assets\Scripts\GUI\MessageBox.cs" />
-    <Compile Include="Assets\Scripts\GUI\SelectMap\MapItem.cs" />
-    <Compile Include="Assets\Scripts\GUI\SelectMap\MapSelector.cs" />
-    <Compile Include="Assets\Scripts\GUI\SelectMap\SelectMapTab.cs" />
-    <Compile Include="Assets\Scripts\GUI\SelectMap\TabLocalMaps.cs" />
-    <Compile Include="Assets\Scripts\GUI\ToggleWindow.cs" />
-    <Compile Include="Assets\Scripts\GUI\TowerItem.cs" />
-    <Compile Include="Assets\Scripts\GameVersion.cs" />
-    <Compile Include="Assets\Scripts\Map\MapBase.cs" />
-    <Compile Include="Assets\Scripts\Map\MapInfo.cs" />
-    <Compile Include="Assets\Scripts\Map\MapManager.cs" />
-    <Compile Include="Assets\Scripts\Map\MapObject.cs" />
-    <Compile Include="Assets\Scripts\Map\MapTile.cs" />
-    <Compile Include="Assets\Scripts\Map\TestMaps\TestMap1.cs" />
-    <Compile Include="Assets\Scripts\Map\TileGroup.cs" />
-    <Compile Include="Assets\Scripts\Map\TileHover.cs" />
-    <Compile Include="Assets\Scripts\MapEditor\EditorMap.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\Building.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\IFixedPosition.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\ITileObject.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\Monster.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\MonsterMoveType.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\Monsters\Mob1.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\Monsters\Mob2_Flying.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\TowerBase.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\Towers\DummyTower.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\Towers\TestTower.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\Towers\TowerAirWall.cs" />
-    <Compile Include="Assets\Scripts\MapObjects\Towers\TowerSell.cs" />
-    <Compile Include="Assets\Scripts\MapTiles\MapTileGoal.cs" />
-    <Compile Include="Assets\Scripts\MapTiles\MapTileSpawn.cs" />
-    <Compile Include="Assets\Scripts\Network\Actions\Action.cs" />
-    <Compile Include="Assets\Scripts\Network\Actions\ActionPlaceTower.cs" />
-    <Compile Include="Assets\Scripts\Network\GameManager.cs" />
-    <Compile Include="Assets\Scripts\Network\MessageEvent.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageAction.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageChat.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageGameTick.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessagePlayerJoined.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessagePlayerLeft.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\Message.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageBroadcast.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageCreateGame.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageCreateGameReply.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageDisconnect.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageGetGame.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageGetGameReply.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageJoinGame.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageJoinGameReply.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageLog.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageLogin.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageLoginReply.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageMapDownload.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\MessageSend.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\PreGameMessages\MessageSetReadyStatus.cs" />
-    <Compile Include="Assets\Scripts\Network\Messages\util\IMessageInMessage.cs" />
-    <Compile Include="Assets\Scripts\Network\NetManager.cs" />
-    <Compile Include="Assets\Scripts\Network\Player.cs" />
-    <Compile Include="Assets\Scripts\Other\GameChatInput.cs" />
-    <Compile Include="Assets\Scripts\Other\ISerializedObject.cs" />
-    <Compile Include="Assets\Scripts\Other\Library.cs" />
-    <Compile Include="Assets\Scripts\Pathfinding\IPathNode.cs" />
-    <Compile Include="Assets\Scripts\Pathfinding\IPathable.cs" />
-    <Compile Include="Assets\Scripts\Pathfinding\PathFinder.cs" />
-    <Compile Include="Assets\Scripts\Pathfinding\PathFinders\PFDijkstra4Dir.cs" />
-    <Compile Include="Assets\Scripts\Pathfinding\PathFinders\PathCostCompare.cs" />
-    <Compile Include="Assets\Scripts\Pathfinding\PathNodeInfo.cs" />
-    <Compile Include="Assets\Scripts\Projectiles\Projectile.cs" />
-    <Compile Include="Assets\Scripts\TowerList.cs" />
-    <Compile Include="Assets\Scripts\TowerMenuItem.cs" />
-    <Compile Include="Assets\Scripts\utils\AsyncFileReader.cs" />
-    <Compile Include="Assets\Scripts\utils\ChildrenChangeColliderState.cs" />
-    <Compile Include="Assets\Scripts\utils\ConcurrentQueue.cs" />
-    <Compile Include="Assets\Scripts\utils\DataStream.cs" />
-    <Compile Include="Assets\Scripts\utils\ResourceCache.cs" />
-    <Compile Include="Assets\Scripts\utils\Vector2Gen.cs" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth Cutout.shader" />
-    <None Include="Assets\NGUI\Examples\Models\Orc\Orc Skin.shader" />
-    <None Include="Assets\NGUI\Examples\Atlases\Wooden\Arimo20.txt" />
-    <None Include="Assets\NGUI\Examples\Atlases\Wooden\Arimo14.txt" />
-    <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapSolidOverlay.shader" />
-    <None Include="Assets\NGUI\Resources\Shaders\GUI - Text Shader (SoftClip).shader" />
-    <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapTransparentOverlay.shader" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Dynamic Font (AlphaClip).shader" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Masked Colored.shader" />
-    <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapSolid.shader" />
-    <None Include="Assets\NGUI\Examples\Atlases\Wooden\Arimo18.txt" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (Packed) (AlphaClip) .shader" />
-    <None Include="Assets\Graphics\GUI\MapEditor\atlas_mapeditor.txt" />
-    <None Include="Assets\NGUI\Examples\Atlases\SciFi\SciFi Font - Header.txt" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Premultiplied Colored (AlphaClip).shader" />
-    <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapTransparent.shader" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (AlphaClip).shader" />
-    <None Include="Assets\NGUI\Resources\Shaders\GUI - Text Shader (AlphaClip).shader" />
-    <None Include="Assets\NGUI\Examples\Atlases\Fantasy\Fantasy Font - Normal.txt" />
-    <None Include="Assets\NGUI\Examples\Atlases\Refractive\Refractive Font - Normal.txt" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Dynamic Font (SoftClip).shader" />
-    <None Include="Assets\GameAnalytics\Plugins\WebPlayer\Readme_WebPlayer.txt" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (Packed) (SoftClip).shader" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Premultiplied Colored (SoftClip).shader" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Premultiplied Colored.shader" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Dynamic Font.shader" />
-    <None Include="Assets\NGUI\ReadMe - 2.7.0.txt" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored.shader" />
-    <None Include="Assets\GameAnalytics\Plugins\iOS\iOS_Readme.txt" />
-    <None Include="Assets\NGUI\Examples\Other\English.txt" />
-    <None Include="Assets\NGUI\Examples\Other\French.txt" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (Packed).shader" />
-    <None Include="Assets\GameAnalytics\Plugins\WebPlayer\crossdomain.xml" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Additive Colored.shader" />
-    <None Include="Assets\GameAnalytics\Plugins\Android\Android_Readme.txt" />
-    <None Include="Assets\NGUI\Examples\Atlases\Refractive\Refractive Font - Header.txt" />
-    <None Include="Assets\NGUI\Examples\Shaders\Refractive.shader" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth.shader" />
-    <None Include="Assets\NGUI\Examples\Atlases\SciFi\SciFi Font - Normal.txt" />
-    <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (SoftClip).shader" />
-    <None Include="Assets\NGUI\Examples\Models\Orc Armor\Orc Armor.shader" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Components\GA_Tracker.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\ComboBox.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleBall.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleController.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleFloor.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleHighScore.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleManager.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleMoveWithPlayer.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleTarget.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Examples\Scripts\GA_ExampleWall.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_AdSupport.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Archive.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Business.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_ContinuationManager.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_CustomAdTrigger.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_DataPoint.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Debug.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Design.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Error.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_FacebookSDK.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_GUIHelper.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_GameObjectManager.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_GenericInfo.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Gui.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_HeatMapDataFilter.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_HeatMapDataFilterBase.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_HeatMapRenderer.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_HeatmapData.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Histogram.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_MiniJson.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Quality.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Queue.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Request.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_ServerFieldTypes.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Settings.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_SpecialEvents.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Submit.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_SystemTracker.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_Tracking.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\GA_User.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\MD5.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Framework\Scripts\MD5Wrapper.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendBusinessEvent.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendDesignEvent.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendQualityEvent.cs" />
+     <Compile Include="Assets\GameAnalytics\Plugins\Playmaker\SendUserEvent.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipItems.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipRandomItem.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UICursor.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UIEquipmentSlot.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UIItemSlot.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UIItemStorage.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UIStorageSlot.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvAttachmentPoint.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvBaseItem.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvDatabase.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvEquipment.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvGameItem.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\System\InvStat.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\ChatInput.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\DownloadTexture.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\DragDropContainer.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\DragDropItem.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\DragDropRoot.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\DragDropSurface.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\LagPosition.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\LagRotation.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\LoadLevelOnClick.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\LookAtTarget.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\PanWithMouse.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\PlayIdleAnimations.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\SetColorOnSelection.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\ShaderQuality.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\Spin.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\SpinWithMouse.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\TypewriterEffect.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\UpdateManager.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\WindowAutoYaw.cs" />
+     <Compile Include="Assets\NGUI\Examples\Scripts\Other\WindowDragTilt.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\LanguageSelection.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButton.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonActivate.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonColor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonKeyBinding.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonKeys.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonMessage.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonOffset.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonPlayAnimation.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonRotation.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonScale.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonSound.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIButtonTween.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UICenterOnChild.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UICheckbox.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UICheckboxControlledComponent.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UICheckboxControlledObject.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIDragCamera.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIDragObject.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIDragPanelContents.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIDraggableCamera.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIDraggablePanel.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIForwardEvents.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIGrid.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIImageButton.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIInputValidator.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIPopupList.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UISavedOption.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UIScrollBar.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UISlider.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UISliderColors.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UISoundVolume.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Interaction\UITable.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\ActiveAnimation.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\AnimationOrTween.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\BMFont.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\BMGlyph.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\BMSymbol.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\BetterList.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\ByteReader.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\IgnoreTimeScale.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\Localization.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\NGUIDebug.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\NGUIMath.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\NGUITools.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\SpringPanel.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\UIDrawCall.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\UIEventListener.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\UIGeometry.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\UINode.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Internal\UIWidget.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\AnimatedAlpha.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\AnimatedColor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\SpringPosition.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\TweenAlpha.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\TweenColor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\TweenFOV.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\TweenOrthoSize.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\TweenPosition.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\TweenRotation.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\TweenScale.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\TweenTransform.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\TweenVolume.cs" />
+     <Compile Include="Assets\NGUI\Scripts\Tweening\UITweener.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIAnchor.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIAtlas.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UICamera.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIFilledSprite.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIFont.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIInput.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIInputSaved.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UILabel.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UILocalize.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIOrthoCamera.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIPanel.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIRoot.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UISlicedSprite.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UISprite.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UISpriteAnimation.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIStretch.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UITextList.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UITexture.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UITiledSprite.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
+     <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
+     <Compile Include="Assets\Scripts\Collision\CollisionManager.cs" />
+     <Compile Include="Assets\Scripts\Collision\FixedBoxCollider.cs" />
+     <Compile Include="Assets\Scripts\Collision\FixedCircleCollider.cs" />
+     <Compile Include="Assets\Scripts\Collision\FixedCollider.cs" />
+     <Compile Include="Assets\Scripts\Collision\ICollideHandler.cs" />
+     <Compile Include="Assets\Scripts\Collision\QuadTree\QuadTree.cs" />
+     <Compile Include="Assets\Scripts\Collision\QuadTree\QuadTreeNode.cs" />
+     <Compile Include="Assets\Scripts\GUI\ButtonDestroyObject.cs" />
+     <Compile Include="Assets\Scripts\GUI\GUIPrefabs.cs" />
+     <Compile Include="Assets\Scripts\GUI\Game\GameChat.cs" />
+     <Compile Include="Assets\Scripts\GUI\Game\PreGamePanel.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonMapEditor.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonOnline.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonPlayTestMap.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonCreateGame.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonGetGameInfo.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonJoinGame.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonMultiplayer.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\Online\ButtonReconnect.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\Online\GameInfoLabel.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\Online\MainServerStatusLabel.cs" />
+     <Compile Include="Assets\Scripts\GUI\MainMenu\Online\OnlinePanel.cs" />
+     <Compile Include="Assets\Scripts\GUI\MapEditor\ButtonLoad.cs" />
+     <Compile Include="Assets\Scripts\GUI\MapEditor\ButtonSave.cs" />
+     <Compile Include="Assets\Scripts\GUI\MapEditor\GraphicItem.cs" />
+     <Compile Include="Assets\Scripts\GUI\MapEditor\TileItem.cs" />
+     <Compile Include="Assets\Scripts\GUI\MessageBox.cs" />
+     <Compile Include="Assets\Scripts\GUI\SelectMap\MapItem.cs" />
+     <Compile Include="Assets\Scripts\GUI\SelectMap\MapSelector.cs" />
+     <Compile Include="Assets\Scripts\GUI\SelectMap\SelectMapTab.cs" />
+     <Compile Include="Assets\Scripts\GUI\SelectMap\TabLocalMaps.cs" />
+     <Compile Include="Assets\Scripts\GUI\ToggleWindow.cs" />
+     <Compile Include="Assets\Scripts\GUI\TowerItem.cs" />
+     <Compile Include="Assets\Scripts\GameVersion.cs" />
+     <Compile Include="Assets\Scripts\Map\MapBase.cs" />
+     <Compile Include="Assets\Scripts\Map\MapInfo.cs" />
+     <Compile Include="Assets\Scripts\Map\MapManager.cs" />
+     <Compile Include="Assets\Scripts\Map\MapTile.cs" />
+     <Compile Include="Assets\Scripts\Map\TestMaps\TestMap1.cs" />
+     <Compile Include="Assets\Scripts\Map\TileGroup.cs" />
+     <Compile Include="Assets\Scripts\Map\TileHover.cs" />
+     <Compile Include="Assets\Scripts\MapEditor\EditorMap.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Building.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\IFixedPosition.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\ITileObject.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\MapObject.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\MobSpawn.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Monster.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\MonsterMoveType.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Monsters\Mob1.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Monsters\Mob2_Flying.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\TowerBase.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Towers\DummyTower.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Towers\TestTower.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Towers\TowerAirWall.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\Towers\TowerSell.cs" />
+     <Compile Include="Assets\Scripts\MapTiles\MapTileGoal.cs" />
+     <Compile Include="Assets\Scripts\MapTiles\MapTileSpawn.cs" />
+     <Compile Include="Assets\Scripts\Network\Actions\Action.cs" />
+     <Compile Include="Assets\Scripts\Network\Actions\ActionPlaceTower.cs" />
+     <Compile Include="Assets\Scripts\Network\GameManager.cs" />
+     <Compile Include="Assets\Scripts\Network\MessageEvent.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageAction.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageChat.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageGameSpeed.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageGameState.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageGameTick.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessagePlayerJoined.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessagePlayerLeft.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageSetReady.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageSyncCheck.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\Message.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageBroadcast.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageCreateGame.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageCreateGameReply.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageDisconnect.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageGetGame.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageGetGameReply.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageJoinGame.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageJoinGameReply.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageKickPlayer.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageLog.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageLogin.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageLoginReply.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageMapDownload.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageSend.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\PreGameMessages\MessageSetReadyStatus.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\util\IMessageInMessage.cs" />
+     <Compile Include="Assets\Scripts\Network\NetManager.cs" />
+     <Compile Include="Assets\Scripts\Network\Player.cs" />
+     <Compile Include="Assets\Scripts\Other\GameChatInput.cs" />
+     <Compile Include="Assets\Scripts\Other\ISerializedObject.cs" />
+     <Compile Include="Assets\Scripts\Other\Library.cs" />
+     <Compile Include="Assets\Scripts\Pathfinding\IPathNode.cs" />
+     <Compile Include="Assets\Scripts\Pathfinding\IPathable.cs" />
+     <Compile Include="Assets\Scripts\Pathfinding\PathFinder.cs" />
+     <Compile Include="Assets\Scripts\Pathfinding\PathFinders\PFDijkstra4Dir.cs" />
+     <Compile Include="Assets\Scripts\Pathfinding\PathFinders\PathCostCompare.cs" />
+     <Compile Include="Assets\Scripts\Pathfinding\PathNodeInfo.cs" />
+     <Compile Include="Assets\Scripts\Projectiles\Projectile.cs" />
+     <Compile Include="Assets\Scripts\TowerList.cs" />
+     <Compile Include="Assets\Scripts\TowerMenuItem.cs" />
+     <Compile Include="Assets\Scripts\utils\AsyncFileReader.cs" />
+     <Compile Include="Assets\Scripts\utils\ChildrenChangeColliderState.cs" />
+     <Compile Include="Assets\Scripts\utils\ConcurrentQueue.cs" />
+     <Compile Include="Assets\Scripts\utils\DataStream.cs" />
+     <Compile Include="Assets\Scripts\utils\FixedPointMath\FInt.cs" />
+     <Compile Include="Assets\Scripts\utils\FixedPointMath\FVector2.cs" />
+     <Compile Include="Assets\Scripts\utils\FixedPointMath\FVector3.cs" />
+     <Compile Include="Assets\Scripts\utils\ResourceCache.cs" />
+     <Compile Include="Assets\Scripts\utils\Vector2Gen.cs" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth Cutout.shader" />
+     <None Include="Assets\NGUI\Examples\Models\Orc\Orc Skin.shader" />
+     <None Include="Assets\NGUI\Examples\Atlases\Wooden\Arimo20.txt" />
+     <None Include="Assets\NGUI\Examples\Atlases\Wooden\Arimo14.txt" />
+     <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapSolidOverlay.shader" />
+     <None Include="Assets\NGUI\Resources\Shaders\GUI - Text Shader (SoftClip).shader" />
+     <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapTransparentOverlay.shader" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Dynamic Font (AlphaClip).shader" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Masked Colored.shader" />
+     <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapSolid.shader" />
+     <None Include="Assets\NGUI\Examples\Atlases\Wooden\Arimo18.txt" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (Packed) (AlphaClip) .shader" />
+     <None Include="Assets\Graphics\GUI\MapEditor\atlas_mapeditor.txt" />
+     <None Include="Assets\NGUI\Examples\Atlases\SciFi\SciFi Font - Header.txt" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Premultiplied Colored (AlphaClip).shader" />
+     <None Include="Assets\GameAnalytics\Plugins\Framework\Shaders\GA_HeatMapTransparent.shader" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (AlphaClip).shader" />
+     <None Include="Assets\NGUI\Resources\Shaders\GUI - Text Shader (AlphaClip).shader" />
+     <None Include="Assets\NGUI\Examples\Atlases\Fantasy\Fantasy Font - Normal.txt" />
+     <None Include="Assets\NGUI\Examples\Atlases\Refractive\Refractive Font - Normal.txt" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Dynamic Font (SoftClip).shader" />
+     <None Include="Assets\GameAnalytics\Plugins\WebPlayer\Readme_WebPlayer.txt" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (Packed) (SoftClip).shader" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Premultiplied Colored (SoftClip).shader" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Premultiplied Colored.shader" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Dynamic Font.shader" />
+     <None Include="Assets\NGUI\ReadMe - 2.7.0.txt" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored.shader" />
+     <None Include="Assets\GameAnalytics\Plugins\iOS\iOS_Readme.txt" />
+     <None Include="Assets\NGUI\Examples\Other\English.txt" />
+     <None Include="Assets\NGUI\Examples\Other\French.txt" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (Packed).shader" />
+     <None Include="Assets\GameAnalytics\Plugins\WebPlayer\crossdomain.xml" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Additive Colored.shader" />
+     <None Include="Assets\GameAnalytics\Plugins\Android\Android_Readme.txt" />
+     <None Include="Assets\NGUI\Examples\Atlases\Refractive\Refractive Font - Header.txt" />
+     <None Include="Assets\NGUI\Examples\Shaders\Refractive.shader" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth.shader" />
+     <None Include="Assets\NGUI\Examples\Atlases\SciFi\SciFi Font - Normal.txt" />
+     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (SoftClip).shader" />
+     <None Include="Assets\NGUI\Examples\Models\Orc Armor\Orc Armor.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -363,4 +372,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  
 </Project>

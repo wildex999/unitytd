@@ -18,6 +18,15 @@ public class ButtonMultiplayer : MonoBehaviour {
         if (manager == null)
             return;
 
+        if(manager.mainState == MainServerState.LoggedIn)
+        {
+            //Go on to the next step
+            if (enableObject != null)
+                enableObject.SetActive(true);
+            if (disableObject != null)
+                disableObject.SetActive(false);
+        }
+
         if (manager.mainState == MainServerState.Connected)
             collider.enabled = true;
         else
@@ -35,6 +44,7 @@ public class ButtonMultiplayer : MonoBehaviour {
             Debug.LogError("Could not find username input. Using default.");
         else
             name = username.text;
+
         if (name.Length < 3)
         {
             MessageBox.createMessageBox("Error", "Username must be at least 3 characters long!");

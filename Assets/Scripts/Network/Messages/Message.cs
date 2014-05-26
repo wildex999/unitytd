@@ -30,12 +30,18 @@ public enum MessageCommand
     Broadcast = 14, //Send message to every other player in a game
     SendMessage = 15, //Send message to specific player in a game
     Disconnect = 18, //Reason for disconnect, sent as socket disconnecting.
+    KickPlayer = 19, //Kick player, or this player has been kicked
     Log = 21, //Logging to server side file for debugging
 
 
     //Game server(As long as everyone runs same version, numbers should be the same)
     GameTick, //Broadcast by the authorative player, telling clients to move forward to this tick
     Chat, //Chat message
+    GameState, //Set the new game state
+    SetReady, //Set the players ready state during pre-game
+    Action, //An in-game action(Ex. Place tower)
+    SyncCheck, //Hash objects in a network game, and use to check if the clients are in sync
+    GameSpeed, //Game host changed the game speed
 }
 
 //Who is allowed to send a message(Used to check senderPlayerId)
@@ -80,9 +86,15 @@ public abstract class Message
         MessageSendMessage.registerMessage();
         MessageDisconnect.registerMessage();
         MessageMapDownload.registerMessage();
+        MessageKickPlayer.registerMessage();
 
-
+        MessageGameTick.registerMessage();
         MessageChat.registerMessage();
+        MessageGameState.registerMessage();
+        MessageSetReady.registerMessage();
+        MessageAction.registerMessage();
+        MessageSyncCheck.registerMessage();
+        MessageGameSpeed.registerMessage();
 
     }
     
@@ -150,7 +162,7 @@ public abstract class Message
         message = null;
         MessageCommand command = (MessageCommand)stream.readShort();
 
-        Debug.Log("Got message with command: " + command);
+        //Debug.Log("Got message with command: " + command);
 
         messageParser parser;
         messageParsers.TryGetValue(command, out parser);

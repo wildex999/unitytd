@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using UnityEngine;
 
 //An action that has been performed, or is to be performed.
 //For the local authorative player this is used to delay the local action until the right moment(GameManager FixedUpdate)
@@ -18,9 +19,7 @@ public abstract class Action
 {
     public Actions action;
 
-    //Player who sent this action(Note: Not necessarily then one who initiated it. I.e, client->server(player = client), server->clients(player = server) )
-    //Thus if player = server, can be used to check if the action is authorative or now. If you require initial player, store it as a custom value.
-    public Player player; 
+    public Player player; //Player who sent action(Not necessarily who originaly performed it)
     public GameManager game;
 
     public Action(Actions action, Player player, GameManager game = null)
@@ -33,6 +32,7 @@ public abstract class Action
     //Valid: whether or not the action is valid. If false, ignore action
     public static Action parseAction(BinaryReader stream, Actions action, Player player, GameManager game, out bool valid)
     {
+        Debug.Log("Parse Action: " + action);
         switch(action)
         {
             case Actions.PlaceTower:
@@ -47,5 +47,5 @@ public abstract class Action
     public abstract void run();
 
     //Write to Binary Stream(Network/Recording)
-    public abstract byte[] writeAction(BinaryWriter stream);
+    public abstract byte[] getBytes();
 }

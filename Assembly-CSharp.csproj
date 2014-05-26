@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_STANDALONE_WIN;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_WEBPLAYER;WEBPLUG;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -220,6 +220,7 @@
      <Compile Include="Assets\Scripts\Collision\QuadTree\QuadTreeNode.cs" />
      <Compile Include="Assets\Scripts\GUI\ButtonDestroyObject.cs" />
      <Compile Include="Assets\Scripts\GUI\GUIPrefabs.cs" />
+     <Compile Include="Assets\Scripts\GUI\Game\GameChat.cs" />
      <Compile Include="Assets\Scripts\GUI\Game\PreGamePanel.cs" />
      <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonMapEditor.cs" />
      <Compile Include="Assets\Scripts\GUI\MainMenu\ButtonOnline.cs" />
@@ -247,7 +248,6 @@
      <Compile Include="Assets\Scripts\Map\MapBase.cs" />
      <Compile Include="Assets\Scripts\Map\MapInfo.cs" />
      <Compile Include="Assets\Scripts\Map\MapManager.cs" />
-     <Compile Include="Assets\Scripts\Map\MapObject.cs" />
      <Compile Include="Assets\Scripts\Map\MapTile.cs" />
      <Compile Include="Assets\Scripts\Map\TestMaps\TestMap1.cs" />
      <Compile Include="Assets\Scripts\Map\TileGroup.cs" />
@@ -256,6 +256,8 @@
      <Compile Include="Assets\Scripts\MapObjects\Building.cs" />
      <Compile Include="Assets\Scripts\MapObjects\IFixedPosition.cs" />
      <Compile Include="Assets\Scripts\MapObjects\ITileObject.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\MapObject.cs" />
+     <Compile Include="Assets\Scripts\MapObjects\MobSpawn.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Monster.cs" />
      <Compile Include="Assets\Scripts\MapObjects\MonsterMoveType.cs" />
      <Compile Include="Assets\Scripts\MapObjects\Monsters\Mob1.cs" />
@@ -273,9 +275,13 @@
      <Compile Include="Assets\Scripts\Network\MessageEvent.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageAction.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageChat.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageGameSpeed.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageGameState.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageGameTick.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessagePlayerJoined.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessagePlayerLeft.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageSetReady.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\GameMessages\MessageSyncCheck.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\Message.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\MessageBroadcast.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\MessageCreateGame.cs" />
@@ -285,6 +291,7 @@
      <Compile Include="Assets\Scripts\Network\Messages\MessageGetGameReply.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\MessageJoinGame.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\MessageJoinGameReply.cs" />
+     <Compile Include="Assets\Scripts\Network\Messages\MessageKickPlayer.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\MessageLog.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\MessageLogin.cs" />
      <Compile Include="Assets\Scripts\Network\Messages\MessageLoginReply.cs" />
@@ -310,6 +317,9 @@
      <Compile Include="Assets\Scripts\utils\ChildrenChangeColliderState.cs" />
      <Compile Include="Assets\Scripts\utils\ConcurrentQueue.cs" />
      <Compile Include="Assets\Scripts\utils\DataStream.cs" />
+     <Compile Include="Assets\Scripts\utils\FixedPointMath\FInt.cs" />
+     <Compile Include="Assets\Scripts\utils\FixedPointMath\FVector2.cs" />
+     <Compile Include="Assets\Scripts\utils\FixedPointMath\FVector3.cs" />
      <Compile Include="Assets\Scripts\utils\ResourceCache.cs" />
      <Compile Include="Assets\Scripts\utils\Vector2Gen.cs" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth Cutout.shader" />

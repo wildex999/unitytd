@@ -30,6 +30,7 @@ public enum GameState
 {
     PreGame, //Waiting for players to join and ready up
     Running, //Game is in progress
+    Paused, //Game is paused
     Ended //Game has finished. Waiting for new map/ready
 }
 
@@ -40,8 +41,11 @@ public class GameManager : MonoBehaviour
     private MapManager map;
     private NetManager net;
     private GameState gameState;
-    private PreGamePanel preGame;
     private UITextList currentChatOutput;
+
+    //GUI
+    private PreGamePanel preGame;
+    private MessageBox infoBox; //Used to show "Waiting for ..."
 
     //Loaded map data(For map id 0 when authorative)
     private byte[] loadedMapData;
@@ -50,21 +54,30 @@ public class GameManager : MonoBehaviour
     private string gameName = "";
     private int maxPlayers = 1;
 
-    private List<Action> actionQueue = new List<Action>(); //Actions to be performed for next tick
+    private Dictionary<uint, List<Action>> actionQueue = new Dictionary<uint, List<Action>>(); //Actions to be performed for specific tick
+    public List<Action> outgoingActions = new List<Action>(); //Actions performed this step which are to be sent(Authorative)
+    private Dictionary<uint, int> hashHistory = new Dictionary<uint, int>(); //Hash history for the different steps
 
     public List<Player> players = new List<Player>();
     public Player thisPlayer;
     public Player gameHost; //Hosting player(Authorative)
     public bool isAuthorative; //Whether this GamerManager is authorative(We are authorative player)
 
-    private uint serverFixedStep; //The last step update received from the authorative server
-    private uint currentFixedStep; //Our current step
+    private uint serverFixedStep = 0; //The last step update received from the authorative server
+    private uint currentFixedStep = 0; //Our current step
+    private bool waitingServerStep = false; //When true, waiting for server to progress game tick
 
     private MapInfo loadMapSceneChange = null;
 
+    private bool doLaunch = false;
+    private bool launched = false;
+
     //Disconnect error
     bool gotDisconnected = false;
+    string disconnectTitle = "Disconnected from server";
     string disconnectMessage;
+
+    bool normalExit = false; //When set to true, player exited, so we just kill GameManager
 
     //Constructor multiplayer
     public static GameManager createGameManager(NetManager net, bool isAuthorative, MapManager map = null, string gameName = "", int maxPlayers = 1)
@@ -88,8 +101,20 @@ public class GameManager : MonoBehaviour
             //Look for events
             mgr.net.DisconnectEvent += mgr.OnDisconnect;
             MessagePlayerJoined.messageEvent += mgr.OnPlayerJoined;
+            MessagePlayerLeft.messageEvent += mgr.OnPlayerLeft;
             MessageChat.messageEvent += mgr.onChatMessage;
+            MessageKickPlayer.messageEvent += mgr.onKickPlayer;
+            MessageGameState.messageEvent += mgr.onSetGameState;
+            MessageGameTick.messageEvent += mgr.onAuthorativeGameTick;
+            MessageAction.messageEvent += mgr.onAction;
+            MessageSyncCheck.messageEvent += mgr.onSyncCheck;
             GameChatInput.ChatEvent += mgr.onChatInput;
+
+            //Set the NetManagers game to this
+            mgr.net.setGame(mgr);
+
+            //Pause the game until launched
+            Time.timeScale = 0.0f;
         }
 
         Player localPlayer = Player.getLocalPlayer();
@@ -101,6 +126,14 @@ public class GameManager : MonoBehaviour
         mgr.gameName = gameName;
         mgr.maxPlayers = maxPlayers;
         mgr.gameState = GameState.Ended;
+
+        mgr.currentFixedStep = 0;
+        mgr.serverFixedStep = 0;
+
+        if (maxPlayers == 1)
+            mgr.launched = true;
+
+        mgr.actionQueue[mgr.currentFixedStep+1] = new List<Action>();
 
         //TODO: Get remote host and players when joining
 
@@ -116,7 +149,12 @@ public class GameManager : MonoBehaviour
 
         //Cleanup events
         MessagePlayerJoined.messageEvent -= OnPlayerJoined;
+        MessagePlayerLeft.messageEvent -= OnPlayerLeft;
         MessageChat.messageEvent -= onChatMessage;
+        MessageKickPlayer.messageEvent -= onKickPlayer;
+        MessageGameState.messageEvent -= onSetGameState;
+        MessageGameTick.messageEvent -= onAuthorativeGameTick;
+        MessageAction.messageEvent -= onAction;
         GameChatInput.ChatEvent -= onChatInput;
 
         if (net == null)
@@ -140,10 +178,21 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        //List for exit(TODO: Replace with a proper menu)
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (net != null)
+                net.closeConnection(net.mainSocket, DisconnectCause.Disconnect, "Player exited!");
+
+            normalExit = true;
+            Application.LoadLevel(0);
+        }
+
         //When game is paused, we still need to update GameManager
         if(Time.timeScale == 0.0)
         {
-            FixedUpdate();
+            if(!launched)
+                FixedUpdate();
             //Check for new network messages since NetManager also runs on FixedUpdate
             if (net != null)
             {
@@ -154,30 +203,131 @@ public class GameManager : MonoBehaviour
 
     public void FixedUpdate()
     {
-        Monster.lastMonsterId = 0;
+        if (!launched)
+        {
+            if(!doLaunch)
+                return;
+            Time.timeScale = 1; //Start game logic
+            launched = true;
+        }
+
+        if (gameState == GameState.PreGame || gameState == GameState.Paused)
+            return;
 
         if(isAuthorative)
         {
-            //If authorative, send step update to everyone in game
-            //Gather everything that has happened the last step, and send it(Tower placement etc.)
-            //MessageBroadcast broadcast = new MessageBroadcast();
+            currentFixedStep++;
 
             //Perform all queued actions
-            foreach(Action action in actionQueue)
-            {
+            List<Action> currentActions = actionQueue[currentFixedStep];
+            foreach (Action action in currentActions)
                 action.run();
+
+            //Remove actions
+            actionQueue.Remove(currentFixedStep);
+
+            //Send actions for this tick
+            if (net != null)
+            {
+                foreach (Action action in outgoingActions)
+                    net.broadcastAction(action);
+
+                //Send tick update
+                MessageGameTick tickMessage = new MessageGameTick(currentFixedStep);
+                MessageBroadcast broadcast = new MessageBroadcast(tickMessage, false);
+                net.sendMessage(net.mainSocket, broadcast);
             }
-            //TODO: Actions might cause actions to be added?
-            actionQueue.Clear();
+            outgoingActions.Clear();
+
+            //Set-up next action queue
+            actionQueue[currentFixedStep + 1] = new List<Action>();
+
+            //Update all Map Objects
+            map.updateMapObjects();
+            //Do collision checks(Targeting)
+            map.collisionManager.doCollisionCheck();
+
+            //Hash in case of HashSync
+            if((currentFixedStep % MapBase.simFramerate) == 0)
+            {
+                int hash = getMapHash();
+                
+                //Store it for later comparison
+                hashHistory[currentFixedStep] = hash;
+            }
         }
         else
         {
             //If we are bypassing the server, pause the game and wait for more data
-            if(currentFixedStep+1 > serverFixedStep)
+            if (currentFixedStep + 1 > serverFixedStep)
+            {
+                if(!waitingServerStep)
+                {
+                    //Inform player
+                    infoBox = MessageBox.createMessageBox("Waiting", "Waiting for server tick...");
+                    infoBox.setButtonVisible(false);
+                }
+
+                //TODO: If we are hitting the limit a lot, allow it to fall a bit behind(Bad connection)
+
+                waitingServerStep = true;
                 Time.timeScale = 0;
+            }
             else
+            {
+                //If too much behind, speed up the game a bit
+                if (serverFixedStep - (currentFixedStep + 1) > 2)
+                    Time.timeScale = 1.1f;
+                else if (Time.timeScale > 1.0f) //TODO: Don't use timeScale to check this, as we want to be able to speed up the waves independently of this
+                    Time.timeScale = 1.0f;
+
                 currentFixedStep += 1;
+
+                //TODO: Can server skip steps? If so this might throw. For example if joining game in progress.
+                //List<Action> currentActions = actionQueue[currentFixedStep];
+                List<Action> currentActions;
+                actionQueue.TryGetValue(currentFixedStep, out currentActions);
+                if (currentActions != null)
+                {
+                    //Perform queued actions
+                    foreach (Action action in currentActions)
+                        action.run();
+
+                    //Remove actions
+                    actionQueue.Remove(currentFixedStep);
+                }
+
+                //Next action queue is set up when receiving the step from server
+
+
+                //Update all Map Objects
+                map.updateMapObjects();
+                //Do collision checks(Targeting)
+                map.collisionManager.doCollisionCheck();
+
+                //Hash in case of HashSync
+                if ((currentFixedStep % MapBase.simFramerate) == 0)
+                {
+                    int hash = getMapHash();
+
+                    //Send it to host
+                    MessageSyncCheck syncMessage = new MessageSyncCheck(currentFixedStep, hash);
+                    MessageSendMessage message = new MessageSendMessage(gameHost, syncMessage);
+                    net.sendMessage(net.mainSocket, message);
+                }
+
+            }
         }
+
+    }
+
+    //Get sync hash of all Map Objects
+    public int getMapHash()
+    {
+        int hash = 0;
+        foreach (MapObject obj in map.objectList)
+            hash += obj.getSyncHash();
+        return hash;
     }
 
     //Constructor single player
@@ -189,6 +339,11 @@ public class GameManager : MonoBehaviour
     public static GameManager getGameManager()
     {
         return instance;
+    }
+
+    public uint getCurrentFixedStep()
+    {
+        return currentFixedStep;
     }
 
     //Called whenever connection to the main server is lost
@@ -206,6 +361,43 @@ public class GameManager : MonoBehaviour
             gotDisconnected = true;
             disconnectMessage = message;
             Application.LoadLevel(0);
+        }
+    }
+
+    //Server has progressed game tick
+    void onAuthorativeGameTick(MessageGameTick message)
+    {
+        if (!isAuthorative)
+        {
+            //If we are a client, update server step
+            serverFixedStep = message.getTick();
+            //Debug.LogWarning("ServerGameTick: " + serverFixedStep);
+
+            //Set-up action queue for step
+            actionQueue[serverFixedStep+1] = new List<Action>();
+
+            if (currentFixedStep + 1 > serverFixedStep)
+            {
+                //Assert: This should not happen. That would either mean the server tick didn't move or moved backwards. Or we moved ahead
+                Debug.LogWarning("Strange server tick event: Didn't move? " + currentFixedStep + " | " + serverFixedStep);
+                return;
+            }
+
+            if (waitingServerStep)
+            {
+                waitingServerStep = false;
+
+                //Resume the game
+                Time.timeScale = 1.0f;
+                if (infoBox != null)
+                    Destroy(infoBox.gameObject);
+            }
+        }
+        else
+        {
+            //If we are the host, keep a watch on the other players step
+            //(If they fall behind, we slow down the game a bit)
+            //TODO:
         }
     }
 
@@ -227,13 +419,16 @@ public class GameManager : MonoBehaviour
             else
             {
                 MapInfo mapInfo = map.getMapInfo();
-                Debug.Log("Map Id:" + mapInfo.id);
                 if (mapInfo.id == 0)
                 {
-                    Debug.Log("Sent map download");
                     MessageMapDownload mapDownload = new MessageMapDownload(loadedMapData);
                     MessageSendMessage newMessage = new MessageSendMessage(newPlayer, mapDownload);
-                    net.sendMessage(net.mainSocket, newMessage);
+                    if(!net.sendMessage(net.mainSocket, newMessage))
+                    {
+                        Debug.LogError("Failed to send map!");
+                        //TODO: Disconnect?
+                    }
+                    Debug.Log("Sent map download");
                 }
             }
         }
@@ -243,8 +438,91 @@ public class GameManager : MonoBehaviour
         if (gameState == GameState.PreGame)
             preGame.infoUpdated();
 
-        if(currentChatOutput != null)
-            currentChatOutput.Add("[" + newPlayer.getName() + " joined the game!]");
+        chatAddSystemMessage(newPlayer.getName() + " joined the game!");
+    }
+
+    //Handle player leaving
+    void OnPlayerLeft(MessagePlayerLeft message)
+    {
+        Player player = getPlayer(message.getPlayerId());
+        if(player == null)
+        {
+            Debug.LogError("Got player left for player which was not in game: " + message.getPlayerId());
+            return;
+        }
+        Debug.Log("Player left: " + player.getName());
+
+        //TODO: Game logic of player leaving if we are in game
+
+        players.Remove(player);
+
+        if (gameState == GameState.PreGame)
+            preGame.infoUpdated();
+
+        chatAddSystemMessage(player.getName() + " left the game!");
+    }
+
+    //We have been kicked from the game
+    void onKickPlayer(MessageKickPlayer message)
+    {
+        //Kick to menu, inform player of kick reason
+        gotDisconnected = true;
+        disconnectTitle = "Kicked from game";
+        disconnectMessage = message.getReason();
+        Application.LoadLevel(0);
+    }
+
+    //Action from player
+    void onAction(MessageAction message)
+    {
+        byte[] actionData = message.getActionData();
+        Actions actionType = message.getActionType();
+
+        Player player = getPlayer(message.senderPlayerId);
+        if (player == null)
+        {
+            Debug.LogError("Got action(" + actionType + ") from player which is not in game! Id: " + message.senderPlayerId);
+            return;
+        }
+
+        bool valid;
+        BinaryReader stream = new BinaryReader(new MemoryStream(actionData));
+        Action theAction = Action.parseAction(stream, actionType, player, this, out valid);
+
+        if (!valid)
+            return; //TODO: If host, kick player
+
+        Debug.Log("Got Action: " + theAction.action);
+
+        //The action should itself verify permissions, so we simply queue the action for next tick
+        if (isAuthorative)
+            actionQueue[currentFixedStep + 1].Add(theAction);
+        else
+            actionQueue[serverFixedStep + 1].Add(theAction);
+    }
+
+    void onSyncCheck(MessageSyncCheck message)
+    {
+        if(!isAuthorative)
+        {
+            Debug.LogError("Got sync from player, when not authorative!");
+            return;
+        }
+
+        int serverHash = hashHistory[message.getTick()];
+        if(serverHash != message.getHash())
+        {
+            string syncMessage = "Game is out of sync at tick " + message.getTick() + "!!!  Server: " + serverHash + " Client: " + message.getHash() + "  Client: " + getPlayer(message.senderPlayerId);
+            if (currentChatOutput != null)
+                currentChatOutput.Add(syncMessage);
+
+            MessageChat chatMessage = new MessageChat(syncMessage, false);
+            MessageBroadcast broadcast = new MessageBroadcast(chatMessage, false);
+            net.sendMessage(net.mainSocket, broadcast);
+
+            //Debug.LogError(syncMessage);
+        }
+
     }
 
     //Chat message from other player
@@ -284,17 +562,44 @@ public class GameManager : MonoBehaviour
             currentChatOutput.Add("[" + Player.getLocalPlayer().getName() + "] " + message);*/
     }
 
+    //Host has changed GameState
+    void onSetGameState(MessageGameState message)
+    {
+        //Only listen to Host
+        if (message.senderPlayerId != gameHost.getId())
+        {
+            Debug.LogError("Non-host tried to set Game State! Id: " + message.senderPlayerId);
+            return;
+        }
 
+        setGameState(message.getGameState());
+    }
+
+    public void chatAddSystemMessage(string message)
+    {
+        if (currentChatOutput != null)
+            currentChatOutput.Add("[F7FE2E][" + message + "][-]"); //TODO: Color it gray-ish
+    }
+
+    //Switch to new gamestate, and if authorative we inform the players. 
     public void setGameState(GameState newState)
     {
         if (newState == gameState)
             return;
 
+        if(isAuthorative && net != null)
+        {
+            MessageGameState messageState = new MessageGameState(newState);
+            MessageBroadcast broadcast = new MessageBroadcast(messageState, false);
+            net.sendMessage(net.mainSocket, broadcast);
+        }
+
         //Clean up existing game state
         switch(gameState)
         {
             case GameState.PreGame:
-                //TODO: Close pregamepanel
+                //Close pregamepanel
+                Destroy(preGame.gameObject);
                 break;
         }
 
@@ -303,6 +608,7 @@ public class GameManager : MonoBehaviour
         {
             case GameState.PreGame:
                 //Stop game logic while in pre-game
+                doLaunch = false;
                 Time.timeScale = 0;
                 //Show Pre-Game panel
                 preGame = PreGamePanel.createPreGamePanel(GameObject.FindGameObjectWithTag("MessagePanel"), this);
@@ -311,7 +617,18 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Running:
                 if (gameState == GameState.PreGame)
-                    Time.timeScale = 1; //Start game logic
+                {
+                    doLaunch = true;
+
+                    //Create in-game chat
+                    GameChat chat = GameChat.createGameChat(GameObject.FindGameObjectWithTag("MessagePanel"));
+                    chat.transform.localPosition = new Vector3(-440, -296, 0);
+                    setCurrentChatOutput(chat.output);
+
+                    //Reset step counters
+                    currentFixedStep = 0;
+                    serverFixedStep = 0;
+                }
                 break;
         }
 
@@ -396,9 +713,15 @@ public class GameManager : MonoBehaviour
 
     void OnLevelWasLoaded(int level)
     {
+        if(normalExit)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         if(gotDisconnected)
         {
-            MessageBox box = MessageBox.createMessageBox("Lost Connection", "Lost connection to server: " + disconnectMessage);
+            MessageBox box = MessageBox.createMessageBox(disconnectTitle, disconnectMessage);
             Destroy(gameObject);
             return;
         }
@@ -431,24 +754,39 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    //In-Game Actions
+    //--In-Game Actions--
+
+    //Queue the action for next step
+    public void queueAction(Action action)
+    {
+        if(isAuthorative)
+        {
+            //Queue for ourself to execute
+            actionQueue[currentFixedStep + 1].Add(action);
+        }
+        else
+        {
+            //Send action(Queue at Host)
+            net.sendAction(action, gameHost);
+            Debug.Log("Sent action: " + action.action);
+        }
+    }
 
     //Local request to place tower
     public void placeTower(MapTile tile, TowerBase tower)
     {
-        if(isAuthorative)
+        if(!isAuthorative)
         {
-            //Create action and add to queue
-            ActionPlaceTower placeTowerAction = new ActionPlaceTower(this, tile, tower, thisPlayer);
-            actionQueue.Add(placeTowerAction);
+            if (!map.clientPlaceTower(tile, tower))
+                return;
         }
-        else
-        {
-            if (map.clientPlaceTower(tile, tower))
-            {
-                //Create action and send to authorative GameManager
-            }
-        }
+        ActionPlaceTower placeTowerAction = new ActionPlaceTower(this, tile, tower, thisPlayer);
+        queueAction(placeTowerAction);
+    }
+
+    public NetManager getNetManager()
+    {
+        return net;
     }
 
     public void setCurrentChatOutput(UITextList chatOutput)

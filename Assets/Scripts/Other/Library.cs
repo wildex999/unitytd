@@ -39,4 +39,11 @@ public class Library : MonoBehaviour
             prefabs[(int)id] = obj;
         }
     }
+
+    public GameObject getPrefab(int id)
+    {
+        if (id >= prefabs.Count)
+            return null;
+        return prefabs[id];
+    }
 }

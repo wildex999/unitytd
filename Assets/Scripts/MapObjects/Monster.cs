@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 public class Monster : MapObject, IPathable, ICollideHandler {
 
@@ -21,26 +22,24 @@ public class Monster : MapObject, IPathable, ICollideHandler {
     public static LinkedList<Monster> monsters = new LinkedList<Monster>();
     private LinkedListNode<Monster> listNode;
 
-    public static int monsterId = 0;
-    public static int lastMonsterId = 0;
-    public int thisMonsterId = 0;
-    public override void init(MapManager map, Vector2Gen<int> fixedPosition)
+    public override void OnCreate()
     {
- 	    base.init(map, fixedPosition);
         fixedCollider = new FixedCircleCollider(this, colliderRadius);
         map.collisionManager.addUnit(fixedCollider);
 
         //Add to list of active monsters
         listNode = monsters.AddLast(this);
-        thisMonsterId = monsterId++;
+
+        //Debug.Log("Monster init on step: " + map.getGameManager().getCurrentFixedStep() + "\n" + Environment.StackTrace);
     }
 
-    public void OnDisable()
+    public override void OnRemove()
     {
         isDead = true;
         if(listNode != null)
             monsters.Remove(listNode);
-        map.collisionManager.removeUnit(fixedCollider);
+        if(fixedCollider != null)
+            map.collisionManager.removeUnit(fixedCollider);
     }
 
     //Caled when hit by a projectile
@@ -122,13 +121,6 @@ public class Monster : MapObject, IPathable, ICollideHandler {
     //For fixed simulation
     public void followPathFixed()
     {
-        //Do some asserts to verify update order
-        if(lastMonsterId > thisMonsterId)
-        {
-            Debug.LogError("Incorrect Monster update order! Last: " + lastMonsterId + " This: " + thisMonsterId);
-        }
-        lastMonsterId = thisMonsterId;
-
         getNode();
         if(nextNode == null)
             return;
@@ -142,9 +134,9 @@ public class Monster : MapObject, IPathable, ICollideHandler {
         //Check move direction
         while (movementRemain > 0)
         {
-            Vector2Gen<int> nodePos = nextNode.getFixedPosition();
-            int xDiff = nodePos.x - fixedPosition.x;
-            int yDiff = nodePos.y - fixedPosition.y;
+            FVector2 nodePos = nextNode.getFixedPosition();
+            int xDiff = (int)(nodePos.x - fixedPosition.x);
+            int yDiff = (int)(nodePos.y - fixedPosition.y);
 
             if (xDiff != 0)
             {
@@ -156,7 +148,7 @@ public class Monster : MapObject, IPathable, ICollideHandler {
                     else
                         xDiff = (int)-movementRemain;
                 }
-                fixedPosition = new Vector2Gen<int>(fixedPosition.x + xDiff, fixedPosition.y);
+                fixedPosition = new FVector2(fixedPosition.x + xDiff, fixedPosition.y);
                 if (xDiff > 0)
                     movementRemain -= xDiff;
                 else
@@ -171,7 +163,7 @@ public class Monster : MapObject, IPathable, ICollideHandler {
                     else
                         yDiff = (int)-movementRemain;
                 }
-                fixedPosition = new Vector2Gen<int>(fixedPosition.x, fixedPosition.y + yDiff);
+                fixedPosition = new FVector2(fixedPosition.x, fixedPosition.y + yDiff);
                 if (yDiff > 0)
                     movementRemain -= yDiff;
                 else
@@ -194,7 +186,7 @@ public class Monster : MapObject, IPathable, ICollideHandler {
         }
 
         //Set local postion to fixed position(Sync)
-        transform.localPosition = getPosition();
+        transform.localPosition = getPosition(true);
     }
 
     //Make local sprite follow path

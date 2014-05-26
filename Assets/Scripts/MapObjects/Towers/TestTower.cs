@@ -5,40 +5,35 @@ public class TestTower : TowerBase
     private static int size = 2; //2x2
     private static GameObject bulletBase = null;
 
-    public float firePause; //Timet to wait between fiering
-    private float bulletTimer; 
+    public int firePause; //Timet(Steps) to wait between firing
+    private int bulletTimer; 
 
-    public void Start()
+    public override void OnCreate()
     {
-        if(bulletBase == null)
+        base.OnCreate();
+
+        if (bulletBase == null)
             bulletBase = Resources.Load<GameObject>("Projectiles/Laser");
 
-        setDetectionRange(1.5f);
-        bulletTimer = 0f;
+        bulletTimer = 0;
         GA.API.Design.NewEvent("ALPHA1:GAME:BuiltTower", transform.position);
     }
 
-    public void Update()
+    public override void StepUpdate()
     {
         //Fire at current target
         if (currentTarget != null)
         {
-            bulletTimer -= Time.deltaTime;
-            if (bulletTimer > 0f)
+            bulletTimer--;
+            if (bulletTimer > 0)
                 return;
-            
-            Projectile bullet = createProjectile(bulletBase);
-            bullet.transform.position = transform.position;
+
+            Projectile bullet = createProjectile(bulletBase, getFixedPosition());
             bullet.setTarget(currentTarget);
             bulletTimer += firePause;
         }
         else
-            bulletTimer = 0f;
-    }
-
-    public void FixedUpdate()
-    {
-
+            bulletTimer = 0;
     }
 
     public override string getName()
@@ -48,7 +43,7 @@ public class TestTower : TowerBase
 
     public override string getDescription()
     {
-        return "Your everyday basic Test Tower! Free air included with every 10th purchase.";
+        return "Your everyday basic Test Tower!\nFree air included with every 10th purchase.";
     }
 
     public override uint getPrice()
@@ -100,11 +95,5 @@ public class TestTower : TowerBase
     public override Sprite getPlacementSprite()
     {
         return GetComponent<SpriteRenderer>().sprite;
-    }
-
-    //Set the towers detection range
-    public void setDetectionRange(float range)
-    {
-        GetComponent<CircleCollider2D>().radius = range;
     }
 }

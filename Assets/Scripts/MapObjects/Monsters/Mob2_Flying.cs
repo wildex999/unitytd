@@ -12,8 +12,9 @@ public class Mob2_Flying : Monster
         moveType = MonsterMoveType.Flying;
     }
 
-    void Start()
+    public override void OnCreate()
     {
+        base.OnCreate();
         setPath(map.flyingPath);
     }
 
@@ -23,7 +24,7 @@ public class Mob2_Flying : Monster
         followPathLocal();
     }
 
-    void FixedUpdate()
+    public override void StepUpdate()
     {
         followPathFixed();
     }
