@@ -385,6 +385,9 @@ public class MapManager : MapBase {
     {
         clearMap();
 
+        sizeX = width;
+        sizeY = height;
+
         for (int y = 0; y < height; y++)
         {
             List<MapTile> xList = new List<MapTile>();
@@ -434,9 +437,10 @@ public class MapManager : MapBase {
             return maxX;
     }
 
-    public override float getSize()
+    public override void getSize(out int x, out int y)
     {
-        throw new NotImplementedException();
+        x = sizeX;
+        y = sizeY;
     }
 
     public void setGameManager(GameManager newGameManager)

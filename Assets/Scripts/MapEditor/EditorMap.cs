@@ -245,9 +245,11 @@ public class EditorMap : MapBase {
         throw new NotImplementedException();
     }
 
-    public override float getSize()
+    public override void getSize(out int x, out int y)
     {
-        throw new NotImplementedException();
+        //TODO: Calculate size from placed tiles, or update it when placing tiles!
+        x = sizeX;
+        y = sizeY;
     }
 
     private void OnMapNameSubmit(string newName)

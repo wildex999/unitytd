@@ -14,6 +14,9 @@ public abstract class MapBase : MonoBehaviour
 
     private ResourceCache<GameObject> prefabCache = new ResourceCache<GameObject>();
 
+    protected int sizeX;
+    protected int sizeY;
+
     public MapBase()
     {
         if (unitSizeFixed / 2f != Mathf.Floor(unitSizeFixed / 2f))
@@ -257,5 +260,5 @@ public abstract class MapBase : MonoBehaviour
 
     //Return the map size
     public abstract uint getSizeFixed();
-    public abstract float getSize();
+    public abstract void getSize(out int x, out int y);
 }

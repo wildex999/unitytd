@@ -321,6 +321,7 @@
      <Compile Include="Assets\Scripts\utils\FixedPointMath\FInt.cs" />
      <Compile Include="Assets\Scripts\utils\FixedPointMath\FVector2.cs" />
      <Compile Include="Assets\Scripts\utils\FixedPointMath\FVector3.cs" />
+     <Compile Include="Assets\Scripts\utils\PriorityQueue.cs" />
      <Compile Include="Assets\Scripts\utils\ResourceCache.cs" />
      <Compile Include="Assets\Scripts\utils\Vector2Gen.cs" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth Cutout.shader" />
