@@ -5,3 +5,5 @@ Assets/Resources/GameAnalytics/GA_Settings.asset.meta
 build
 Assets/NGUI/Examples/
 Library/ScriptAssemblies/
+unitytd_server/playerLogs/
+unitytd_server/node_modules/
