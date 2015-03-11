@@ -1,7 +1,7 @@
 ::UnityTD(Temp. name)::
 
-This is a game created with Unity 4. It's a 2D Tower Defence game, with online multiplayer and mazing.
-It's currentl unfinished, only having the basic capabilities, but no actualy game on top of it.
+This is a game created with Unity 4. It's a 2D Tower Defence game, with online multiplayer and mazing(Towers and enemies share space, forcing enemies to pathfind).
+It's currently unfinished, only having the basic capabilities, but no actual game on top of it.
 What is implemented:
 
 - Basic 2D Grid based Tower Defence.
