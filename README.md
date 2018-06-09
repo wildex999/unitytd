@@ -36,3 +36,12 @@ Instead each client will be running their own deterministic simulation, taking o
 Pathfinding, Collision detection and movement is all written in deterministic fixed-point.
   - Built inn hash check to see if they have fallen out of sync(But no way to correct or join mid-game)
   - Currently it all seems to work without any problems.
+  
+- How to build:
+Game:
+  - Update mainIp in NetManager.cs if server not running on localhost(Multiplayer only).
+  - Build game using Unity 4.5(Last tested)
+Server:
+  - cd unitytd_server
+  - npm install async
+  - node main.js
