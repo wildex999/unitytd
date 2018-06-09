@@ -38,10 +38,12 @@ Pathfinding, Collision detection and movement is all written in deterministic fi
   - Currently it all seems to work without any problems.
   
 - How to build:
+
 Game:
-  - Update mainIp in NetManager.cs if server not running on localhost(Multiplayer only).
-  - Build game using Unity 4.5(Last tested)
+- Update mainIp in NetManager.cs if server not running on localhost(Multiplayer only).
+- Build game using Unity 4.5(Last tested)
+
 Server:
-  - cd unitytd_server
-  - npm install async
-  - node main.js
+- cd unitytd_server
+- npm install async
+- node main.js
