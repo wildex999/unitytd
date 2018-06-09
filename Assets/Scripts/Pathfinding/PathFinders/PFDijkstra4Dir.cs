@@ -55,6 +55,9 @@ public class PFDijkstra4Dir : PathFinder
     //Tries to get the node from the nodes dictionary, or gets it from the map if not available(Creates new PathNodeInfo)
     public PathNodeInfo getNode(int x, int y, bool createIfNotFound = false)
     {
+        if (y < 0 || y >= nodes.Count || x < 0 || x >= nodes[y].Count)
+            return null;
+
         PathNodeInfo node = nodes[y][x];
         if (node == null && createIfNotFound)
         {
@@ -210,10 +213,28 @@ public class PFDijkstra4Dir : PathFinder
         List<PathNodeInfo> neighbours = new List<PathNodeInfo>(4);
         int tileX = node.node.getNodeX();
         int tileY = node.node.getNodeY();
-        neighbours.Add(getNode(tileX + 1, tileY, createIfNotFound)); //Right
-        neighbours.Add(getNode(tileX - 1, tileY, createIfNotFound)); //Left
-        neighbours.Add(getNode(tileX, tileY + 1, createIfNotFound)); //Up(Positive Y up or down?)
-        neighbours.Add(getNode(tileX, tileY - 1, createIfNotFound)); //Down(?)
+        PathNodeInfo cn;
+
+        //Right
+        cn = getNode(tileX + 1, tileY, createIfNotFound);
+        if(cn != null)
+            neighbours.Add(cn);
+
+        //Left
+        cn = getNode(tileX - 1, tileY, createIfNotFound);
+        if(cn != null)
+            neighbours.Add(cn);
+
+        //Up(Positive Y up or down?)
+        cn = getNode(tileX, tileY + 1, createIfNotFound);
+        if(cn != null)
+            neighbours.Add(cn);
+
+        //Down
+        cn = getNode(tileX, tileY - 1, createIfNotFound);
+        if(cn != null)
+            neighbours.Add(cn);
+
         //To include diagonals, add them to the neighbours list here
 
         return neighbours;

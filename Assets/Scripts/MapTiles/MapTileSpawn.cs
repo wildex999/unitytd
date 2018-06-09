@@ -12,6 +12,7 @@ public class MapTileSpawn : MapTile
         //Create MobSpawner
         GameObject obj = new GameObject();
         MobSpawn spawn = obj.AddComponent<MobSpawn>();
-        map.addObject(spawn, new FVector2(x*(int)MapBase.unitSizeFixed, y*(int)MapBase.unitSizeFixed));
+        if(map != null)
+            map.addObject(spawn, new FVector2(x*(int)MapBase.unitSizeFixed, y*(int)MapBase.unitSizeFixed));
     }
 }

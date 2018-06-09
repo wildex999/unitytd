@@ -97,8 +97,8 @@ public class NetManager : MonoBehaviour
     private static NetManager instance;
     private GameManager game;
 
-    //public static string mainIp = "127.0.0.1";
-    public static string mainIp = "95.85.53.18";
+    public static string mainIp = "127.0.0.1";
+    //public static string mainIp = "95.85.53.18";
     public static int mainPort = 12000;
 
     public Socket mainSocket;
